@@ -1,0 +1,42 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:kidslearn_ai/app/providers.dart';
+import 'package:kidslearn_ai/features/auth/controllers/parent_unlock.dart';
+import 'package:kidslearn_ai/main.dart';
+
+import '../fakes/fake_auth_repository.dart';
+import '../fakes/fake_child_repository.dart';
+
+/// Makes the test screen the size of a typical Android phone (360 × 800 dp).
+void usePhoneScreen(WidgetTester tester) {
+  tester.view.physicalSize = const Size(1080, 2400);
+  tester.view.devicePixelRatio = 3.0;
+  addTearDown(tester.view.reset);
+}
+
+/// The whole app with fake sign-in and fake child storage (no Firebase, no disk).
+Widget buildTestApp({
+  required FakeAuthRepository auth,
+  FakeChildRepository? children,
+  bool parentUnlocked = false,
+}) {
+  return ProviderScope(
+    overrides: [
+      authRepositoryProvider.overrideWithValue(auth),
+      childRepositoryProvider.overrideWithValue(
+        children ?? FakeChildRepository(),
+      ),
+      if (parentUnlocked) parentUnlockProvider.overrideWith(_StartUnlocked.new),
+    ],
+    child: const KidsLearnApp(),
+  );
+}
+
+/// Starts with the parent area already open, to test parent screens quickly.
+class _StartUnlocked extends ParentUnlock {
+  @override
+  bool build() {
+    return true;
+  }
+}

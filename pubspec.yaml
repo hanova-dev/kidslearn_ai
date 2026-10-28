@@ -1,0 +1,56 @@
+name: kidslearn_ai
+description: "KidsLearn AI - bilingual comic storyteller and speech tutor"
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_auth: 7.0.1
+  firebase_core: 5.1.0
+  flutter_riverpod: 3.4.3
+  go_router: 18.1.1
+  path_provider: 2.1.6
+  sqflite: 2.4.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: 6.0.0
+  sqflite_common_ffi: 2.4.5
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: Fredoka
+      fonts:
+        - asset: assets/fonts/Fredoka-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Fredoka-Bold.ttf
+          weight: 700
+    - family: Andika
+      fonts:
+        - asset: assets/fonts/Andika-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Andika-Bold.ttf
+          weight: 700
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Nunito-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Nunito-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Nunito-ExtraBold.ttf
+          weight: 800
+    - family: NotoNastaliqUrdu
+      fonts:
+        - asset: assets/fonts/NotoNastaliqUrdu-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/NotoNastaliqUrdu-Bold.ttf
+          weight: 700

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "433218611751",
+    "project_id": "kidslearn-ai-3f309",
+    "storage_bucket": "kidslearn-ai-3f309.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:433218611751:android:88966a7fddb30cf91efc02",
+        "android_client_info": {
+          "package_name": "pk.edu.comsats.kidslearn_ai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFVBuCP7q7_9_Rcz6ssX_vXVU-u9S-J48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
