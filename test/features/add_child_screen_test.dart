@@ -44,6 +44,23 @@ void main() {
     expect(children.saved, isEmpty);
   });
 
+  // ── Old messages go away once fixed (emulator test 28 Oct) ──
+  testWidgets('messages disappear when the name and buddy are fixed', (
+    tester,
+  ) async {
+    await openAddChild(tester, FakeChildRepository());
+    await tapStart(tester);
+    expect(find.text("Please type your child's name."), findsOneWidget);
+    expect(find.text('Please pick a buddy.'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextFormField), 'Ali');
+    await tester.tap(find.bySemanticsLabel('Mango the fox'));
+    await tester.pump();
+
+    expect(find.text("Please type your child's name."), findsNothing);
+    expect(find.text('Please pick a buddy.'), findsNothing);
+  });
+
   // ── Full form saves and shows the child ──
   testWidgets('a full form saves the child and shows it on parent home', (
     tester,

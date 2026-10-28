@@ -84,6 +84,7 @@ class _AddChildScreenState extends ConsumerState<AddChildScreen> {
       body: SafeArea(
         child: Form(
           key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             children: [
               Expanded(
@@ -120,7 +121,10 @@ class _AddChildScreenState extends ConsumerState<AddChildScreen> {
                       const FieldLabel('PICK A BUDDY'),
                       BuddyPicker(
                         selected: _buddy,
-                        onPick: (buddy) => setState(() => _buddy = buddy),
+                        onPick: (buddy) => setState(() {
+                          _buddy = buddy;
+                          _message = null;
+                        }),
                       ),
                       const SizedBox(height: 20),
 
@@ -189,7 +193,10 @@ class _AddChildScreenState extends ConsumerState<AddChildScreen> {
     return AgeGroupCard(
       ageGroup: ageGroup,
       isSelected: _ageGroup == ageGroup,
-      onTap: () => setState(() => _ageGroup = ageGroup),
+      onTap: () => setState(() {
+        _ageGroup = ageGroup;
+        _message = null;
+      }),
     );
   }
 }

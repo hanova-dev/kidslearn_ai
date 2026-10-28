@@ -1,24 +1,24 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 28 Oct 2026 (Week 1, M2 started early).
+Last update: 28 Oct 2026 (Week 1, M2 started early). Emulator test evidence: notes/images/device_test_2026-10-28/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
 |---|---|---|---|
 | Step 0 environment (Flutter, Java, Android SDK) | Both | Done | Tested on the emulator; the physical phone (vivo Y21) is still to connect |
 | Step 0 free-tier check (Groq, Cloudflare, Firebase) | Hanan | Done | Decisions 012, 013, 014 |
-| Project skeleton, folders, fonts, theme tokens (SRS 10.11) | Wahab | In progress | Splash works on the emulator; quiz not answered yet; first commit 3189b3c pushed to private repo hanova-dev/kidslearn_ai, tag v0.1-m1-week1 (28 Oct) |
+| Project skeleton, folders, fonts, theme tokens (SRS 10.11) | Wahab | In progress | Splash works on the emulator; night mode checked on emulator 28 Oct; quiz not answered yet; first commit 3189b3c pushed to private repo hanova-dev/kidslearn_ai, tag v0.1-m1-week1 (28 Oct) |
 
 ## M1 — Account, RBAC and onboarding (Wahab)
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
-| FR-AUTH-01 | Email/password sign-up and login | In progress | Screen + FirebaseAuthRepository built; widget tests pass; real Firebase sign-up on a device NOT tested yet (28 Oct); waiting for quiz (decision 014) |
-| FR-AUTH-02 | Child profile: name, buddy, age group, language | In progress | Add child screen + SQLite (decision 015); tests pass; device test NOT done yet (28 Oct) |
-| FR-AUTH-03 | Parent screens only for signed-in parents | In progress | go_router redirect to /login; widget-tested; device test not done yet |
-| FR-AUTH-04 | Parental gate (router guard) | In progress | go_router redirect + maths gate with number pad; decisions 003, 016; widget-tested; device test not done yet |
-| FR-AUTH-05 | Profile picker (who's reading?) | In progress | Who's reading screen + activeChildProvider; widget-tested; device test not done yet; path map is a placeholder until Week 3 |
-| FR-AUTH-06 | Session kept locally (offline) | In progress | Signed-in parent opens on Who's reading (decision 016); widget-tested with fake; device test not done yet |
+| FR-AUTH-01 | Email/password sign-up and login | In progress | Widget tests pass. **Emulator 28 Oct:** sign-up (Firebase session file created), log out, log in OK; wrong-password message seen by team. Waiting for quiz (decision 014) |
+| FR-AUTH-02 | Child profile: name, buddy, age group, language | In progress | Widget tests pass. **Emulator 28 Oct:** empty-form messages shown; child saved (1 SQLite row: mango, reader_5_7, en). Bug found (old messages stayed after fixing a field) → fixed + test, re-checked on emulator. Waiting for quiz |
+| FR-AUTH-03 | Parent screens only for signed-in parents | In progress | go_router redirect to /login. **Emulator 28 Oct:** signed-out start and log out both land on login. Waiting for quiz |
+| FR-AUTH-04 | Parental gate (router guard) | In progress | Router guard + maths gate (decisions 003, 016). **Emulator 28 Oct:** wrong answer → new sum; right answer → parent home. Waiting for quiz |
+| FR-AUTH-05 | Profile picker (who's reading?) | In progress | **Emulator 28 Oct:** child card shown; tap → "Hi, Ali!"; Home returns. Path map is a placeholder until Week 3. Waiting for quiz |
+| FR-AUTH-06 | Session kept locally (offline) | In progress | **Emulator 28 Oct:** force-close while unlocked → reopens on Who's reading, locked, still signed in, child kept (decision 016). Waiting for quiz |
 | FR-HCI-01 | AgeExperiencePolicy (Listener/Reader) | Not started | |
 | FR-HCI-04 | Fixed back/home/help positions (ChildScaffold) | Not started | |
 | FR-HCI-05 | No solid red; colour + icon + sound | Not started | Decision 008 |
