@@ -1,0 +1,126 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:kidslearn_ai/data/local/app_database.dart';
+import 'package:kidslearn_ai/data/local/sqlite_story_repository.dart';
+import 'package:kidslearn_ai/data/models/narrative_result.dart';
+import 'package:kidslearn_ai/data/models/narrative_scene.dart';
+import 'package:kidslearn_ai/data/models/story.dart';
+import 'package:kidslearn_ai/data/models/story_status.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+Story makeDraft(String id) {
+  return Story(
+    id: id,
+    parentId: 'parent-1',
+    childId: 'child-1',
+    promptText: "Zayan doesn't want to share",
+    promptValue: 'Sharing',
+    title: '',
+    moralValue: '',
+    language: 'en',
+    characterSheet: '',
+    seed: 42,
+    status: StoryStatus.draft,
+    approved: false,
+    createdAt: DateTime(2026, 10, 28, 12),
+  );
+}
+
+NarrativeResult makeNarrative(int sceneCount) {
+  return NarrativeResult(
+    title: 'Mango Learns to Share',
+    moralValue: 'Sharing',
+    characterSheet: 'Mango is an orange fox with a green scarf.',
+    scenes: [
+      for (var i = 1; i <= sceneCount; i++)
+        NarrativeScene(text: 'Sentence $i.', imagePrompt: 'Picture $i.'),
+    ],
+  );
+}
+
+void main() {
+  late Database db;
+  late SqliteStoryRepository repository;
+
+  // ── Fresh in-memory database (version 2) for every test ──
+  setUpAll(sqfliteFfiInit);
+  setUp(() async {
+    db = await databaseFactoryFfi.openDatabase(
+      inMemoryDatabasePath,
+      options: OpenDatabaseOptions(
+        version: AppDatabase.version,
+        onCreate: AppDatabase.createTables,
+      ),
+    );
+    repository = SqliteStoryRepository(db);
+  });
+  tearDown(() => db.close());
+
+  // ── Draft first (FR-STORY-03) ──
+  test('a draft is saved and read back with its prompt', () async {
+    await repository.saveDraft(makeDraft('s1'));
+
+    final story = await repository.getStory('s1');
+
+    expect(story!.status, StoryStatus.draft);
+    expect(story.promptText, "Zayan doesn't want to share");
+    expect(story.approved, isFalse);
+  });
+
+  test('saveDraft refuses a story that is not DRAFT', () async {
+    final notDraft = Story.fromMap({
+      ...makeDraft('s2').toMap(),
+      'status': StoryStatus.ready.dbValue,
+    });
+
+    expect(() => repository.saveDraft(notDraft), throwsStateError);
+  });
+
+  // ── Lifecycle (FR-STORY-04) ──
+  test('DRAFT → GENERATING → READY is stored', () async {
+    await repository.saveDraft(makeDraft('s3'));
+
+    await repository.updateStatus('s3', StoryStatus.generating);
+    await repository.updateStatus('s3', StoryStatus.ready);
+
+    expect((await repository.getStory('s3'))!.status, StoryStatus.ready);
+  });
+
+  test('an illegal move throws and the status does not change', () async {
+    await repository.saveDraft(makeDraft('s4'));
+
+    await expectLater(
+      repository.updateStatus('s4', StoryStatus.ready),
+      throwsStateError,
+    );
+    expect((await repository.getStory('s4'))!.status, StoryStatus.draft);
+  });
+
+  // ── Narrative and scenes ──
+  test('saveNarrative stores the title and scenes in reading order', () async {
+    await repository.saveDraft(makeDraft('s5'));
+
+    await repository.saveNarrative('s5', makeNarrative(6));
+
+    final story = await repository.getStory('s5');
+    final scenes = await repository.getScenes('s5');
+    expect(story!.title, 'Mango Learns to Share');
+    expect(story.characterSheet, contains('orange fox'));
+    expect(scenes.length, 6);
+    expect(scenes.first.sequenceNumber, 1);
+    expect(scenes.last.text, 'Sentence 6.');
+    expect(scenes.first.imagePath, isNull);
+  });
+
+  test('regenerating replaces the old scenes', () async {
+    await repository.saveDraft(makeDraft('s6'));
+    await repository.saveNarrative('s6', makeNarrative(6));
+
+    await repository.saveNarrative('s6', makeNarrative(3));
+
+    expect((await repository.getScenes('s6')).length, 3);
+  });
+
+  test('an unknown story id gives null', () async {
+    expect(await repository.getStory('nope'), isNull);
+  });
+}

@@ -13,12 +13,12 @@ Last update: 28 Oct 2026 (Week 1, M2 started early).
 ## M1 — Account, RBAC and onboarding (Wahab)
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
-| FR-AUTH-01 | Email/password sign-up and login | In progress | Screen + FirebaseAuthRepository built, 11 tests pass; real sign-up/log out/log in confirmed on emulator 26 Oct; waiting for quiz (decision 014) |
-| FR-AUTH-02 | Child profile: name, buddy, age group, language | In progress | Add child screen + SQLite (decision 015); 19 tests pass; device test by team pending |
-| FR-AUTH-03 | Parent screens only for signed-in parents | In progress | go_router redirect to /login; tested |
-| FR-AUTH-04 | Parental gate (router guard) | In progress | go_router redirect + maths gate with number pad; decisions 003, 016; tested |
-| FR-AUTH-05 | Profile picker (who's reading?) | In progress | Who's reading screen + activeChildProvider; path map is a placeholder until Week 3 |
-| FR-AUTH-06 | Session kept locally (offline) | In progress | Splash goes straight to parent home when signed in; tested with fake |
+| FR-AUTH-01 | Email/password sign-up and login | In progress | Screen + FirebaseAuthRepository built; widget tests pass; real Firebase sign-up on a device NOT tested yet (28 Oct); waiting for quiz (decision 014) |
+| FR-AUTH-02 | Child profile: name, buddy, age group, language | In progress | Add child screen + SQLite (decision 015); tests pass; device test NOT done yet (28 Oct) |
+| FR-AUTH-03 | Parent screens only for signed-in parents | In progress | go_router redirect to /login; widget-tested; device test not done yet |
+| FR-AUTH-04 | Parental gate (router guard) | In progress | go_router redirect + maths gate with number pad; decisions 003, 016; widget-tested; device test not done yet |
+| FR-AUTH-05 | Profile picker (who's reading?) | In progress | Who's reading screen + activeChildProvider; widget-tested; device test not done yet; path map is a placeholder until Week 3 |
+| FR-AUTH-06 | Session kept locally (offline) | In progress | Signed-in parent opens on Who's reading (decision 016); widget-tested with fake; device test not done yet |
 | FR-HCI-01 | AgeExperiencePolicy (Listener/Reader) | Not started | |
 | FR-HCI-04 | Fixed back/home/help positions (ChildScaffold) | Not started | |
 | FR-HCI-05 | No solid red; colour + icon + sound | Not started | Decision 008 |
@@ -28,8 +28,8 @@ Last update: 28 Oct 2026 (Week 1, M2 started early).
 |---|---|---|---|
 | FR-STORY-01 | Free-text prompt + language input | Not started | English only, decision 005 |
 | FR-STORY-02 | StoryGenerationService → GroqStoryGenerator (JSON) | In progress | Service + adapter built, 7 mocked tests, real call OK 28 Oct (decisions 013, 017); used by screens in task 3 |
-| FR-STORY-03 | Cache DRAFT in SQLite before network | Not started | |
-| FR-STORY-04 | DRAFT / GENERATING / READY / FAILED + retry | Not started | |
+| FR-STORY-03 | Cache DRAFT in SQLite before network | In progress | stories/scenes tables (db v2) + SqliteStoryRepository.saveDraft; controller in task 3 (decision 018) |
+| FR-STORY-04 | DRAFT / GENERATING / READY / FAILED + retry | In progress | StoryStatus.canMoveTo rules + updateStatus checks, tested; screens in task 3 |
 | FR-STORY-05 | Reject too-short prompts | Not started | |
 | FR-STORY-06 | Regenerate from same prompt | Not started | |
 | FR-STORY-07 | Parent preview and approve | Not started | No design page; decision 011 |
