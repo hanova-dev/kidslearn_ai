@@ -6,6 +6,9 @@ import '../data/auth_repository.dart';
 import '../data/child_repository.dart';
 import '../data/local/sqlite_child_repository.dart';
 import '../data/remote/firebase_auth_repository.dart';
+import '../services/groq_story_generator.dart';
+import '../services/story_generation_service.dart';
+import 'app_config.dart';
 import 'router.dart';
 
 // ── Local database ──
@@ -25,6 +28,14 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 /// Where child profiles are stored (SQLite on the phone).
 final childRepositoryProvider = Provider<ChildRepository>((ref) {
   return SqliteChildRepository(ref.watch(databaseProvider));
+});
+
+/// Who writes the stories (Groq gpt-oss-120b today).
+final storyGenerationServiceProvider = Provider<StoryGenerationService>((ref) {
+  return GroqStoryGenerator(
+    apiKey: AppConfig.groqApiKey,
+    modelId: AppConfig.storyModelId,
+  );
 });
 
 // ── Navigation ──

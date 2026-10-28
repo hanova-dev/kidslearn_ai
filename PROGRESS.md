@@ -1,14 +1,14 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 27 Oct 2026 (Week 1).
+Last update: 28 Oct 2026 (Week 1, M2 started early).
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
 |---|---|---|---|
 | Step 0 environment (Flutter, Java, Android SDK) | Both | Done | Tested on the emulator; the physical phone (vivo Y21) is still to connect |
 | Step 0 free-tier check (Groq, Cloudflare, Firebase) | Hanan | Done | Decisions 012, 013, 014 |
-| Project skeleton, folders, fonts, theme tokens (SRS 10.11) | Wahab | In progress | Splash works on the emulator; quiz not answered yet; no git repository found in this folder (26 Oct) |
+| Project skeleton, folders, fonts, theme tokens (SRS 10.11) | Wahab | In progress | Splash works on the emulator; quiz not answered yet; first commit 3189b3c pushed to private repo hanova-dev/kidslearn_ai, tag v0.1-m1-week1 (28 Oct) |
 
 ## M1 — Account, RBAC and onboarding (Wahab)
 | FR | Requirement (short) | Status | Notes |
@@ -27,13 +27,13 @@ Last update: 27 Oct 2026 (Week 1).
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
 | FR-STORY-01 | Free-text prompt + language input | Not started | English only, decision 005 |
-| FR-STORY-02 | StoryGenerationService → GroqStoryGenerator (JSON) | In progress | Spike works, decision 013 |
+| FR-STORY-02 | StoryGenerationService → GroqStoryGenerator (JSON) | In progress | Service + adapter built, 7 mocked tests, real call OK 28 Oct (decisions 013, 017); used by screens in task 3 |
 | FR-STORY-03 | Cache DRAFT in SQLite before network | Not started | |
 | FR-STORY-04 | DRAFT / GENERATING / READY / FAILED + retry | Not started | |
 | FR-STORY-05 | Reject too-short prompts | Not started | |
 | FR-STORY-06 | Regenerate from same prompt | Not started | |
 | FR-STORY-07 | Parent preview and approve | Not started | No design page; decision 011 |
-| FR-STORY-08 | Real name → buddy name in prompts | Not started | Decision 001, 002 |
+| FR-STORY-08 | Real name → buddy name in prompts | In progress | StoryPromptBuilder.redactName, 8 tests (decision 017) |
 
 ## M3 — Illustration (Hanan)
 | FR | Requirement (short) | Status | Notes |
@@ -81,6 +81,6 @@ Last update: 27 Oct 2026 (Week 1).
 |---|---|---|---|
 | NFR-SEC-03 | Keys never in source control | In progress | env/ in .gitignore; check before first commit |
 | NFR-USE-03 | Plain-language errors with retry | In progress | Login errors mapped to plain sentences (AuthFailure) |
-| NFR-REL-02 | 15 s timeout, 2 retries | Not started | Values in app_config.dart |
+| NFR-REL-02 | 15 s timeout, 2 retries | In progress | Done for Groq story calls; FLUX and Whisper later |
 | NFR-REL-05 | Fallback adapter for every AI service | Not started | |
 | NFR-PERF-01 | Verdict ≤ 300 ms | Not started | |
