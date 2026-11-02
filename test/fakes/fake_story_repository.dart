@@ -7,6 +7,7 @@ import 'package:kidslearn_ai/data/story_repository.dart';
 /// In-memory [StoryRepository] that follows the same status rules as SQLite.
 class FakeStoryRepository implements StoryRepository {
   final Map<String, Story> stories = {};
+  final Map<String, List<Scene>> scenes = {};
 
   /// Every status a story moved to, in order, e.g. [GENERATING, READY].
   final List<StoryStatus> statusHistory = [];
@@ -33,6 +34,45 @@ class FakeStoryRepository implements StoryRepository {
       title: narrative.title,
       moralValue: narrative.moralValue,
     );
+    final list = <Scene>[];
+    for (var i = 0; i < narrative.scenes.length; i++) {
+      list.add(
+        Scene(
+          id: '$storyId-scene-${i + 1}',
+          storyId: storyId,
+          sequenceNumber: i + 1,
+          text: narrative.scenes[i].text,
+          imagePrompt: narrative.scenes[i].imagePrompt,
+          imagePath: null,
+          imageSource: null,
+        ),
+      );
+    }
+    scenes[storyId] = list;
+  }
+
+  @override
+  Future<void> saveSceneImage(
+    String sceneId,
+    String imagePath,
+    String source,
+  ) async {
+    for (final list in scenes.values) {
+      for (var i = 0; i < list.length; i++) {
+        final old = list[i];
+        if (old.id == sceneId) {
+          list[i] = Scene(
+            id: old.id,
+            storyId: old.storyId,
+            sequenceNumber: old.sequenceNumber,
+            text: old.text,
+            imagePrompt: old.imagePrompt,
+            imagePath: imagePath,
+            imageSource: source,
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -42,7 +82,7 @@ class FakeStoryRepository implements StoryRepository {
 
   @override
   Future<List<Scene>> getScenes(String storyId) async {
-    return [];
+    return List.of(scenes[storyId] ?? []);
   }
 
   Story _copy(

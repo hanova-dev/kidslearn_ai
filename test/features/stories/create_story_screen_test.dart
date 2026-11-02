@@ -67,8 +67,10 @@ void main() {
     expect(stories.stories, isEmpty);
   });
 
-  // ── Writing, then ready ──
-  testWidgets('shows writing, then the ready story title', (tester) async {
+  // ── Writing and drawing, then ready ──
+  testWidgets('shows writing, then the ready story with all pictures', (
+    tester,
+  ) async {
     final generator = FakeStoryGenerator();
     generator.gate = Completer<void>();
     final stories = FakeStoryRepository();
@@ -84,13 +86,15 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    expect(find.text('Lumi is writing your story…'), findsOneWidget);
+    expect(find.text('Lumi is drawing your story…'), findsOneWidget);
+    expect(find.text('Writing the story'), findsOneWidget);
     expect(stories.stories.values.single.status, StoryStatus.generating);
 
     generator.gate!.complete();
     await tester.pumpAndSettle();
 
     expect(find.text('Your story is ready!'), findsOneWidget);
+    expect(find.text('All 3 pictures drawn'), findsOneWidget);
     expect(find.text('Mango Shares the Ball'), findsOneWidget);
     expect(generator.prompts.single.behaviour, contains('Mango'));
   });

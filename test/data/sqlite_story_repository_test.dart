@@ -120,6 +120,23 @@ void main() {
     expect((await repository.getScenes('s6')).length, 3);
   });
 
+  // ── Scene pictures (FR-ILLUS-02) ──
+  test('saveSceneImage stores the file path and source', () async {
+    await repository.saveDraft(makeDraft('s1'));
+    await repository.saveNarrative('s1', makeNarrative(2));
+
+    await repository.saveSceneImage(
+      's1-scene-2',
+      '/img/s1-scene-2.jpg',
+      'FLUX',
+    );
+
+    final scenes = await repository.getScenes('s1');
+    expect(scenes[0].imagePath, isNull);
+    expect(scenes[1].imagePath, '/img/s1-scene-2.jpg');
+    expect(scenes[1].imageSource, 'FLUX');
+  });
+
   test('an unknown story id gives null', () async {
     expect(await repository.getStory('nope'), isNull);
   });

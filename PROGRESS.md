@@ -1,7 +1,7 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 2 Nov 2026 (Week 2, M2 task 3). Emulator test evidence: notes/images/device_test_2026-10-28/ and notes/images/m2_create_story_2026-11-02/.
+Last update: 2 Nov 2026 (M3 task 1: drawing scenes). Emulator test evidence: notes/images/device_test_2026-10-28/ notes/images/m2_create_story_2026-11-02/ and notes/images/m3_illustration_2026-11-02/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
@@ -29,7 +29,7 @@ Last update: 2 Nov 2026 (Week 2, M2 task 3). Emulator test evidence: notes/image
 | FR-STORY-01 | Free-text prompt + language input | In progress | Create story screen (p7): text or value chip, child chips, English only (decisions 005, 019). **Emulator 2 Nov:** real Groq story for Sara ("Sky Shares Her Colors", 6 scenes). Waiting for quiz |
 | FR-STORY-02 | StoryGenerationService → GroqStoryGenerator (JSON) | In progress | Service + adapter built, 7 mocked tests, real call OK 28 Oct (decisions 013, 017); used by screens in task 3 |
 | FR-STORY-03 | Cache DRAFT in SQLite before network | In progress | StoryCreationController saves DRAFT before the Groq call (test checks the order). **Emulator 2 Nov:** offline story row saved with prompt_value 'Kindness'. Waiting for quiz (decisions 018, 019) |
-| FR-STORY-04 | DRAFT / GENERATING / READY / FAILED + retry | In progress | Story generating screen (p8) + Try again. **Emulator 2 Nov:** writing screen seen; offline → "No internet…" + row FAILED; online + Try again → same story READY, 6 scenes. READY comes before pictures until M3. Waiting for quiz |
+| FR-STORY-04 | DRAFT / GENERATING / READY / FAILED + retry | In progress | Story generating screen (p8) + Try again. **Emulator 2 Nov:** writing screen seen; offline → "No internet…" + row FAILED; online + Try again → same story READY, 6 scenes. READY now only after all pictures (decision 020). Waiting for quiz |
 | FR-STORY-05 | Reject too-short prompts | In progress | StoryInputCheck, 15–300 letters in AppConfig, 6 tests. **Emulator 2 Nov:** empty → "Tell us what the story should teach…"; "Sara hits" → "Please write a little more…"; nothing sent. Waiting for quiz |
 | FR-STORY-06 | Regenerate from same prompt | Not started | |
 | FR-STORY-07 | Parent preview and approve | Not started | No design page; decision 011 |
@@ -38,12 +38,12 @@ Last update: 2 Nov 2026 (Week 2, M2 task 3). Emulator test evidence: notes/image
 ## M3 — Illustration (Hanan)
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
-| FR-ILLUS-01 | IllustrationService → FluxIllustrator + character sheet | In progress | Spike works; no seed (decision 012) |
-| FR-ILLUS-02 | Image saved as file, path in SQLite | Not started | |
-| FR-ILLUS-03 | Show scenes progressively | Not started | |
-| FR-ILLUS-04 | Retry one failed scene | Not started | NSFW false alarm seen in spike |
+| FR-ILLUS-01 | IllustrationService → FluxIllustrator + character sheet | In progress | Style text + character sheet + scene, no seed (decisions 012, 020), 7 mocked tests. **Emulator 2 Nov:** "Mango Tries New Food", 6 FLUX pictures in ~16 s, same fox in each. Issue: FLUX sometimes writes "Mango" on the picture. Waiting for quiz |
+| FR-ILLUS-02 | Image saved as file, path in SQLite | In progress | ImageFileStore + saveSceneImage, tested. **Emulator 2 Nov:** 6 JPG files (236–561 KB) in app_flutter/story_images, paths + 'FLUX' in scenes. Waiting for quiz |
+| FR-ILLUS-03 | Show scenes progressively | In progress | Story generating: "Drawing scene N of 6" + thumbnails. **Emulator 2 Nov:** seen at scene 4 of 6 with 3 thumbnails. Waiting for quiz |
+| FR-ILLUS-04 | Retry one failed scene | In progress | FluxIllustrator retries 2 times (1 s, 2 s), 401 not retried; tested with mocks. Parent "retry pictures later" comes with preview (task 2). Waiting for quiz |
 | FR-ILLUS-05 | Choose 512 / 1024 resolution | Dropped | Not supported by the API (decision 012) |
-| FR-ILLUS-06 | PlaceholderIllustrator fallback | Not started | Drawn in Flutter, decision 010 |
+| FR-ILLUS-06 | PlaceholderIllustrator fallback | In progress | PNG from SceneryPainter (decision 010), per-scene fallback (decision 020). **Emulator 2 Nov:** network cut while drawing → 6 PLACEHOLDER pngs, story still READY, note shown. Waiting for quiz |
 
 ## M4 — Speech-to-text (Hanan)
 | FR | Requirement (short) | Status | Notes |

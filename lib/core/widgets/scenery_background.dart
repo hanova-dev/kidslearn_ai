@@ -13,15 +13,16 @@ class SceneryBackground extends StatelessWidget {
     final isNight = Theme.of(context).brightness == Brightness.dark;
     return SizedBox.expand(
       child: CustomPaint(
-        painter: _SceneryPainter(isNight: isNight),
+        painter: SceneryPainter(isNight: isNight),
         child: child,
       ),
     );
   }
 }
 
-class _SceneryPainter extends CustomPainter {
-  _SceneryPainter({required this.isNight});
+/// Paints the scenery; also used to draw placeholder scene pictures (decision 010).
+class SceneryPainter extends CustomPainter {
+  SceneryPainter({required this.isNight});
 
   final bool isNight;
 
@@ -96,7 +97,7 @@ class _SceneryPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_SceneryPainter oldDelegate) {
+  bool shouldRepaint(SceneryPainter oldDelegate) {
     return oldDelegate.isNight != isNight;
   }
 }

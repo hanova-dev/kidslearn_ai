@@ -4,11 +4,15 @@ import 'package:sqflite/sqflite.dart';
 
 import '../data/auth_repository.dart';
 import '../data/child_repository.dart';
+import '../data/local/image_file_store.dart';
 import '../data/local/sqlite_child_repository.dart';
 import '../data/local/sqlite_story_repository.dart';
 import '../data/remote/firebase_auth_repository.dart';
 import '../data/story_repository.dart';
+import '../services/flux_illustrator.dart';
 import '../services/groq_story_generator.dart';
+import '../services/illustration_service.dart';
+import '../services/placeholder_illustrator.dart';
 import '../services/story_generation_service.dart';
 import 'app_config.dart';
 import 'router.dart';
@@ -43,6 +47,26 @@ final storyGenerationServiceProvider = Provider<StoryGenerationService>((ref) {
     apiKey: AppConfig.groqApiKey,
     modelId: AppConfig.storyModelId,
   );
+});
+
+/// Who draws the scene pictures first (FLUX.1 schnell on Cloudflare today).
+final illustrationServiceProvider = Provider<IllustrationService>((ref) {
+  return FluxIllustrator(
+    accountId: AppConfig.cloudflareAccountId,
+    apiToken: AppConfig.cloudflareApiToken,
+  );
+});
+
+/// Who draws a scene when the first one fails: no network needed (FR-ILLUS-06).
+final fallbackIllustrationServiceProvider = Provider<IllustrationService>((
+  ref,
+) {
+  return PlaceholderIllustrator();
+});
+
+/// Where scene pictures are saved as files (FR-ILLUS-02).
+final imageFileStoreProvider = Provider<ImageFileStore>((ref) {
+  return ImageFileStore();
 });
 
 // ── Navigation ──

@@ -6,11 +6,12 @@ import '../../../app/app_colors.dart';
 import '../../../app/router.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/widgets/lumi_mascot.dart';
-import '../../../data/models/story.dart';
+import '../controllers/story_creation.dart';
 import '../controllers/story_creation_controller.dart';
 import 'progress_step.dart';
+import 'scene_thumbnails.dart';
 
-/// Shows the story being written, then ready or failed (design p8, FR-STORY-04).
+/// Shows the story being written and drawn, then ready or failed (design p8, FR-STORY-04).
 class StoryGeneratingScreen extends ConsumerWidget {
   const StoryGeneratingScreen({super.key});
 
@@ -18,29 +19,36 @@ class StoryGeneratingScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
     final creation = ref.watch(storyCreationControllerProvider);
+    final total = creation.scenes.length;
 
-    // ── Pick title, subtitle and step look for the current status ──
-    var title = 'Lumi is writing your story…';
+    // ── Pick title, subtitle and step looks for the current step ──
+    var title = 'Lumi is drawing your story…';
     var subtitle = 'Usually under a minute. You can leave this screen.';
-    var writingStep = StepLook.active;
-    var isFailed = false;
-    Story? readyStory;
-    if (creation.isLoading) {
-      writingStep = StepLook.active;
-    } else if (creation.hasError) {
-      isFailed = true;
-      title = 'Lumi got stuck';
-      subtitle = creation.error.toString();
-      writingStep = StepLook.failed;
-    } else if (creation.value != null) {
-      readyStory = creation.value;
-      title = 'Your story is ready!';
-      subtitle = 'You can preview and approve it soon.';
-      writingStep = StepLook.done;
-    } else {
-      title = 'No story is being written';
-      subtitle = 'Start a new story from the home screen.';
-      writingStep = StepLook.waiting;
+    var writingLook = StepLook.done;
+    var drawingLook = StepLook.waiting;
+    var drawingLabel = 'Drawing the pictures';
+    switch (creation.step) {
+      case CreationStep.idle:
+        title = 'No story is being made';
+        subtitle = 'Start a new story from the home screen.';
+        writingLook = StepLook.waiting;
+      case CreationStep.writing:
+        writingLook = StepLook.active;
+      case CreationStep.drawing:
+        drawingLook = StepLook.active;
+        final next = creation.drawnCount < total
+            ? creation.drawnCount + 1
+            : total;
+        drawingLabel = 'Drawing scene $next of $total';
+      case CreationStep.ready:
+        title = 'Your story is ready!';
+        subtitle = 'You can preview and approve it soon.';
+        drawingLook = StepLook.done;
+        drawingLabel = 'All $total pictures drawn';
+      case CreationStep.failed:
+        title = 'Lumi got stuck';
+        subtitle = creation.message;
+        writingLook = StepLook.failed;
     }
 
     return Scaffold(
@@ -63,16 +71,22 @@ class StoryGeneratingScreen extends ConsumerWidget {
               Text(subtitle, textAlign: TextAlign.center),
               const SizedBox(height: 24),
 
-              // ── Progress steps ──
-              _StepsCard(writingStep: writingStep),
-              if (readyStory != null) ...[
+              // ── Progress steps and drawn scenes ──
+              _StepsCard(
+                writingLook: writingLook,
+                drawingLook: drawingLook,
+                drawingLabel: drawingLabel,
+              ),
+              const SizedBox(height: 16),
+              SceneThumbnails(scenes: creation.scenes),
+              if (creation.step == CreationStep.ready) ...[
                 const SizedBox(height: 16),
-                _ReadyStoryCard(story: readyStory),
+                _ReadyStoryCard(creation: creation),
               ],
               const Spacer(),
 
               // ── Actions ──
-              if (isFailed)
+              if (creation.step == CreationStep.failed)
                 FilledButton.icon(
                   onPressed: () => ref
                       .read(storyCreationControllerProvider.notifier)
@@ -93,9 +107,15 @@ class StoryGeneratingScreen extends ConsumerWidget {
 }
 
 class _StepsCard extends StatelessWidget {
-  const _StepsCard({required this.writingStep});
+  const _StepsCard({
+    required this.writingLook,
+    required this.drawingLook,
+    required this.drawingLabel,
+  });
 
-  final StepLook writingStep;
+  final StepLook writingLook;
+  final StepLook drawingLook;
+  final String drawingLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -109,11 +129,8 @@ class _StepsCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          ProgressStep(label: 'Writing the story', look: writingStep),
-          const ProgressStep(
-            label: 'Drawing the pictures',
-            look: StepLook.waiting,
-          ),
+          ProgressStep(label: 'Writing the story', look: writingLook),
+          ProgressStep(label: drawingLabel, look: drawingLook),
         ],
       ),
     );
@@ -121,14 +138,15 @@ class _StepsCard extends StatelessWidget {
 }
 
 class _ReadyStoryCard extends StatelessWidget {
-  const _ReadyStoryCard({required this.story});
+  const _ReadyStoryCard({required this.creation});
 
-  final Story story;
+  final StoryCreation creation;
 
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
     final textTheme = Theme.of(context).textTheme;
+    final story = creation.story!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -142,6 +160,14 @@ class _ReadyStoryCard extends StatelessWidget {
           Text(story.title, style: textTheme.titleMedium),
           const SizedBox(height: 4),
           Text('Lesson: ${story.moralValue}', style: textTheme.bodyMedium),
+          if (creation.placeholderCount > 0) ...[
+            const SizedBox(height: 8),
+            Text(
+              '${creation.placeholderCount} pictures use a simple picture '
+              'for now. You can try drawing them again later.',
+              style: textTheme.bodySmall?.copyWith(color: colors.inkMuted),
+            ),
+          ],
         ],
       ),
     );

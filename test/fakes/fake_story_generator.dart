@@ -40,6 +40,8 @@ class FakeStoryGenerator implements StoryGenerationService {
       characterSheet: 'A small orange fox with a blue scarf.',
       scenes: const [
         NarrativeScene(text: 'Mango has a red ball.', imagePrompt: 'a ball'),
+        NarrativeScene(text: 'Mango gives the ball.', imagePrompt: 'giving'),
+        NarrativeScene(text: 'They play together.', imagePrompt: 'playing'),
       ],
     );
   }

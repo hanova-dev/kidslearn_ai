@@ -71,6 +71,21 @@ class SqliteStoryRepository implements StoryRepository {
     });
   }
 
+  // ── Save a scene picture's file path ──
+  @override
+  Future<void> saveSceneImage(
+    String sceneId,
+    String imagePath,
+    String source,
+  ) async {
+    await _db.update(
+      'scenes',
+      {'image_path': imagePath, 'image_source': source},
+      where: 'scene_id = ?',
+      whereArgs: [sceneId],
+    );
+  }
+
   // ── Load ──
   @override
   Future<Story?> getStory(String storyId) async {

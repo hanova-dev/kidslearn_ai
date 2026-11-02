@@ -7,6 +7,8 @@ import 'package:kidslearn_ai/main.dart';
 
 import '../fakes/fake_auth_repository.dart';
 import '../fakes/fake_child_repository.dart';
+import '../fakes/fake_illustrator.dart';
+import '../fakes/fake_image_file_store.dart';
 import '../fakes/fake_story_generator.dart';
 import '../fakes/fake_story_repository.dart';
 
@@ -17,12 +19,13 @@ void usePhoneScreen(WidgetTester tester) {
   addTearDown(tester.view.reset);
 }
 
-/// The whole app with fake sign-in, storage and story writer (no Firebase, disk or network).
+/// The whole app with fake sign-in, storage, story writer and illustrators (no Firebase, disk or network).
 Widget buildTestApp({
   required FakeAuthRepository auth,
   FakeChildRepository? children,
   FakeStoryRepository? stories,
   FakeStoryGenerator? storyGenerator,
+  FakeIllustrator? illustrator,
   bool parentUnlocked = false,
 }) {
   return ProviderScope(
@@ -37,6 +40,13 @@ Widget buildTestApp({
       storyGenerationServiceProvider.overrideWithValue(
         storyGenerator ?? FakeStoryGenerator(),
       ),
+      illustrationServiceProvider.overrideWithValue(
+        illustrator ?? FakeIllustrator(),
+      ),
+      fallbackIllustrationServiceProvider.overrideWithValue(
+        FakeIllustrator(source: 'PLACEHOLDER'),
+      ),
+      imageFileStoreProvider.overrideWithValue(FakeImageFileStore()),
       if (parentUnlocked) parentUnlockProvider.overrideWith(_StartUnlocked.new),
     ],
     child: const KidsLearnApp(),

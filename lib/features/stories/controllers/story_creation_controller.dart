@@ -1,35 +1,35 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/constants/buddies.dart';
 import '../../../core/errors/story_generation_failure.dart';
 import '../../../data/models/child_profile.dart';
+import '../../../data/models/scene.dart';
+import '../../../data/models/scene_image.dart';
 import '../../../data/models/story.dart';
 import '../../../data/models/story_prompt.dart';
 import '../../../data/models/story_status.dart';
 import '../../../services/story_prompt_builder.dart';
+import 'story_creation.dart';
 
-/// Creates one story: DRAFT → GENERATING → READY or FAILED (FR-STORY-03, FR-STORY-04).
+/// Creates one story: DRAFT → GENERATING (write, then draw) → READY or FAILED.
 ///
-/// State: loading while writing, data with the ready story, or error with a plain message.
-class StoryCreationController extends AsyncNotifier<Story?> {
-  String? _storyId;
+/// FR-STORY-03, FR-STORY-04, FR-ILLUS-01..04, FR-ILLUS-06.
+class StoryCreationController extends Notifier<StoryCreation> {
   StoryPrompt? _prompt;
 
   @override
-  FutureOr<Story?> build() {
-    return null;
+  StoryCreation build() {
+    return const StoryCreation(step: CreationStep.idle);
   }
 
-  /// Saves a draft for [child] and asks the story model to write it.
+  /// Saves a draft for [child], writes the story, then draws every scene.
   Future<void> create({
     required String text,
     required String value,
     required ChildProfile child,
   }) async {
-    state = const AsyncLoading();
+    state = const StoryCreation(step: CreationStep.writing);
 
     // ── Save draft story to SQLite (before the network call) ──
     final parentId = ref.read(authRepositoryProvider).currentUserId ?? '';
@@ -44,7 +44,7 @@ class StoryCreationController extends AsyncNotifier<Story?> {
       moralValue: '',
       language: child.language,
       characterSheet: '',
-      seed: 0,
+      seed: now.millisecondsSinceEpoch % 1000000,
       status: StoryStatus.draft,
       approved: false,
       createdAt: now,
@@ -52,18 +52,12 @@ class StoryCreationController extends AsyncNotifier<Story?> {
     try {
       await ref.read(storyRepositoryProvider).saveDraft(draft);
     } catch (error) {
-      state = AsyncError(
-        const StoryGenerationFailure(
-          'Could not save the story. Please try again.',
-        ),
-        StackTrace.current,
-      );
+      _fail('Could not save the story. Please try again.');
       return;
     }
 
     // ── Build the redacted prompt (no real name) ──
     final buddy = Buddies.byId(child.buddyId);
-    _storyId = draft.id;
     _prompt = StoryPromptBuilder.build(
       parentText: text,
       value: value,
@@ -71,33 +65,74 @@ class StoryCreationController extends AsyncNotifier<Story?> {
       buddyName: buddy.name,
       buddyAnimal: buddy.animal,
     );
-    await _write();
+    state = StoryCreation(step: CreationStep.writing, story: draft);
+    await _writeAndDraw(draft.id);
   }
 
-  /// Tries the last story again after a failure, with the same prompt (FR-STORY-04).
+  /// Tries the last failed story again with the same prompt (FR-STORY-04).
   Future<void> retry() async {
-    if (_storyId == null || _prompt == null) {
+    final story = state.story;
+    if (story == null || _prompt == null) {
       return;
     }
-    state = const AsyncLoading();
-    await _write();
+    state = StoryCreation(step: CreationStep.writing, story: story);
+    await _writeAndDraw(story.id);
   }
 
-  // ── Ask the story model and save the answer ──
-  Future<void> _write() async {
+  // ── Write the story, draw the scenes, mark READY ──
+  Future<void> _writeAndDraw(String storyId) async {
     final repository = ref.read(storyRepositoryProvider);
-    final service = ref.read(storyGenerationServiceProvider);
-    final storyId = _storyId!;
     try {
       await repository.updateStatus(storyId, StoryStatus.generating);
-      final narrative = await service.generateNarrative(_prompt!);
+      final narrative = await ref
+          .read(storyGenerationServiceProvider)
+          .generateNarrative(_prompt!);
       await repository.saveNarrative(storyId, narrative);
+      await _showProgress(storyId, CreationStep.drawing);
+
+      final scenes = await repository.getScenes(storyId);
+      for (final scene in scenes) {
+        await _drawScene(scene, narrative.characterSheet);
+        await _showProgress(storyId, CreationStep.drawing);
+      }
+
       await repository.updateStatus(storyId, StoryStatus.ready);
-      state = AsyncData(await repository.getStory(storyId));
+      await _showProgress(storyId, CreationStep.ready);
     } catch (error) {
       await _markFailed(storyId);
-      state = AsyncError(_friendly(error), StackTrace.current);
+      _fail(_friendly(error));
     }
+  }
+
+  // ── Draw one scene: FLUX first, placeholder if FLUX fails (FR-ILLUS-06) ──
+  Future<void> _drawScene(Scene scene, String characterSheet) async {
+    final seed = state.story?.seed ?? 0;
+    SceneImage image;
+    try {
+      image = await ref
+          .read(illustrationServiceProvider)
+          .renderScene(scene.imagePrompt, characterSheet, seed);
+    } catch (error) {
+      image = await ref
+          .read(fallbackIllustrationServiceProvider)
+          .renderScene(scene.imagePrompt, characterSheet, seed);
+    }
+
+    // ── Save image file, path in SQLite (FR-ILLUS-02) ──
+    final path = await ref.read(imageFileStoreProvider).save(scene.id, image);
+    await ref
+        .read(storyRepositoryProvider)
+        .saveSceneImage(scene.id, path, image.source);
+  }
+
+  // ── Reload story and scenes so the screen shows the latest ──
+  Future<void> _showProgress(String storyId, CreationStep step) async {
+    final repository = ref.read(storyRepositoryProvider);
+    state = StoryCreation(
+      step: step,
+      story: await repository.getStory(storyId),
+      scenes: await repository.getScenes(storyId),
+    );
   }
 
   // ── Mark FAILED so the story can be retried later ──
@@ -111,18 +146,24 @@ class StoryCreationController extends AsyncNotifier<Story?> {
     }
   }
 
-  StoryGenerationFailure _friendly(Object error) {
-    if (error is StoryGenerationFailure) {
-      return error;
-    }
-    return const StoryGenerationFailure(
-      'Something went wrong while writing the story. Please try again.',
+  void _fail(String message) {
+    state = StoryCreation(
+      step: CreationStep.failed,
+      story: state.story,
+      message: message,
     );
+  }
+
+  String _friendly(Object error) {
+    if (error is StoryGenerationFailure) {
+      return error.message;
+    }
+    return 'Something went wrong while making the story. Please try again.';
   }
 }
 
 /// Gives the Create story and Story generating screens the [StoryCreationController].
 final storyCreationControllerProvider =
-    AsyncNotifierProvider<StoryCreationController, Story?>(
+    NotifierProvider<StoryCreationController, StoryCreation>(
       StoryCreationController.new,
     );

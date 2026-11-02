@@ -14,6 +14,9 @@ abstract class StoryRepository {
   /// Stores the model's title, moral, character sheet and scenes (replacing old scenes).
   Future<void> saveNarrative(String storyId, NarrativeResult narrative);
 
+  /// Records where a scene's picture file is and who drew it (FR-ILLUS-02).
+  Future<void> saveSceneImage(String sceneId, String imagePath, String source);
+
   /// One story, or null if it does not exist.
   Future<Story?> getStory(String storyId);
 
