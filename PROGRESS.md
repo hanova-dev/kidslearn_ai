@@ -1,7 +1,7 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 28 Oct 2026 (Week 1, M2 started early). Emulator test evidence: notes/images/device_test_2026-10-28/.
+Last update: 2 Nov 2026 (Week 2, M2 task 3). Emulator test evidence: notes/images/device_test_2026-10-28/ and notes/images/m2_create_story_2026-11-02/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
@@ -26,14 +26,14 @@ Last update: 28 Oct 2026 (Week 1, M2 started early). Emulator test evidence: not
 ## M2 — Story generation (Hanan)
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
-| FR-STORY-01 | Free-text prompt + language input | Not started | English only, decision 005 |
+| FR-STORY-01 | Free-text prompt + language input | In progress | Create story screen (p7): text or value chip, child chips, English only (decisions 005, 019). **Emulator 2 Nov:** real Groq story for Sara ("Sky Shares Her Colors", 6 scenes). Waiting for quiz |
 | FR-STORY-02 | StoryGenerationService → GroqStoryGenerator (JSON) | In progress | Service + adapter built, 7 mocked tests, real call OK 28 Oct (decisions 013, 017); used by screens in task 3 |
-| FR-STORY-03 | Cache DRAFT in SQLite before network | In progress | stories/scenes tables (db v2) + SqliteStoryRepository.saveDraft; controller in task 3 (decision 018) |
-| FR-STORY-04 | DRAFT / GENERATING / READY / FAILED + retry | In progress | StoryStatus.canMoveTo rules + updateStatus checks, tested; screens in task 3 |
-| FR-STORY-05 | Reject too-short prompts | Not started | |
+| FR-STORY-03 | Cache DRAFT in SQLite before network | In progress | StoryCreationController saves DRAFT before the Groq call (test checks the order). **Emulator 2 Nov:** offline story row saved with prompt_value 'Kindness'. Waiting for quiz (decisions 018, 019) |
+| FR-STORY-04 | DRAFT / GENERATING / READY / FAILED + retry | In progress | Story generating screen (p8) + Try again. **Emulator 2 Nov:** writing screen seen; offline → "No internet…" + row FAILED; online + Try again → same story READY, 6 scenes. READY comes before pictures until M3. Waiting for quiz |
+| FR-STORY-05 | Reject too-short prompts | In progress | StoryInputCheck, 15–300 letters in AppConfig, 6 tests. **Emulator 2 Nov:** empty → "Tell us what the story should teach…"; "Sara hits" → "Please write a little more…"; nothing sent. Waiting for quiz |
 | FR-STORY-06 | Regenerate from same prompt | Not started | |
 | FR-STORY-07 | Parent preview and approve | Not started | No design page; decision 011 |
-| FR-STORY-08 | Real name → buddy name in prompts | In progress | StoryPromptBuilder.redactName, 8 tests (decision 017) |
+| FR-STORY-08 | Real name → buddy name in prompts | In progress | StoryPromptBuilder.redactName, 8 tests + controller test (decision 017). **Emulator 2 Nov:** prompt "Sara does not want…" → story about Sky; "Sara" not found in title, character sheet or scenes. Waiting for quiz |
 
 ## M3 — Illustration (Hanan)
 | FR | Requirement (short) | Status | Notes |

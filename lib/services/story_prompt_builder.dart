@@ -63,7 +63,7 @@ class StoryPromptBuilder {
   }
 
   // ── Message text sent to the model ──
-  /// The user message: hero, lesson and situation, one per line.
+  /// The user message: hero, lesson and situation, one per line (empty parts are left out).
   static String userMessage(StoryPrompt prompt) {
     final lines = <String>[
       'Hero: ${prompt.buddyName} the ${prompt.buddyAnimal}.',
@@ -71,7 +71,9 @@ class StoryPromptBuilder {
     if (prompt.value.isNotEmpty) {
       lines.add('Lesson: ${prompt.value}.');
     }
-    lines.add('Situation: ${prompt.behaviour}');
+    if (prompt.behaviour.isNotEmpty) {
+      lines.add('Situation: ${prompt.behaviour}');
+    }
     lines.add('Language: English.');
     return lines.join('\n');
   }

@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/app_colors.dart';
 import '../../../app/router.dart';
-import '../../../core/constants/app_fonts.dart';
 import '../../../core/constants/buddies.dart';
 import '../../../core/widgets/field_label.dart';
+import '../../../core/widgets/language_choice.dart';
 import '../../../data/models/age_group.dart';
 import '../controllers/add_child_controller.dart';
 import 'age_group_card.dart';
@@ -141,20 +141,7 @@ class _AddChildScreenState extends ConsumerState<AddChildScreen> {
                       const SizedBox(height: 20),
 
                       // ── Language ──
-                      Row(
-                        children: [
-                          _LanguagePill(label: 'English', isSelected: true),
-                          const SizedBox(width: 8),
-                          _LanguagePill(label: 'اردو', isSelected: false),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Urdu: coming soon',
-                              style: textTheme.bodyMedium,
-                            ),
-                          ),
-                        ],
-                      ),
+                      const LanguageChoice(),
                     ],
                   ),
                 ),
@@ -213,38 +200,6 @@ class _ProgressBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(3),
-      ),
-    );
-  }
-}
-
-class _LanguagePill extends StatelessWidget {
-  const _LanguagePill({required this.label, required this.isSelected});
-
-  final String label;
-  final bool isSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppColors.of(context);
-    final isUrdu = label == 'اردو';
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? colors.primary : Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isSelected ? colors.primary : colors.border),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontFamily: isUrdu ? AppFonts.notoNastaliqUrdu : AppFonts.nunito,
-          fontWeight: FontWeight.w700,
-          height: isUrdu ? 1.0 : null,
-          color: isSelected
-              ? Theme.of(context).colorScheme.onPrimary
-              : colors.inkMuted,
-        ),
       ),
     );
   }

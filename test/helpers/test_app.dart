@@ -7,6 +7,8 @@ import 'package:kidslearn_ai/main.dart';
 
 import '../fakes/fake_auth_repository.dart';
 import '../fakes/fake_child_repository.dart';
+import '../fakes/fake_story_generator.dart';
+import '../fakes/fake_story_repository.dart';
 
 /// Makes the test screen the size of a typical Android phone (360 × 800 dp).
 void usePhoneScreen(WidgetTester tester) {
@@ -15,10 +17,12 @@ void usePhoneScreen(WidgetTester tester) {
   addTearDown(tester.view.reset);
 }
 
-/// The whole app with fake sign-in and fake child storage (no Firebase, no disk).
+/// The whole app with fake sign-in, storage and story writer (no Firebase, disk or network).
 Widget buildTestApp({
   required FakeAuthRepository auth,
   FakeChildRepository? children,
+  FakeStoryRepository? stories,
+  FakeStoryGenerator? storyGenerator,
   bool parentUnlocked = false,
 }) {
   return ProviderScope(
@@ -26,6 +30,12 @@ Widget buildTestApp({
       authRepositoryProvider.overrideWithValue(auth),
       childRepositoryProvider.overrideWithValue(
         children ?? FakeChildRepository(),
+      ),
+      storyRepositoryProvider.overrideWithValue(
+        stories ?? FakeStoryRepository(),
+      ),
+      storyGenerationServiceProvider.overrideWithValue(
+        storyGenerator ?? FakeStoryGenerator(),
       ),
       if (parentUnlocked) parentUnlockProvider.overrideWith(_StartUnlocked.new),
     ],

@@ -95,6 +95,12 @@ class ParentHomeScreen extends ConsumerWidget {
 
               // ── Actions ──
               FilledButton.icon(
+                onPressed: () => context.go(AppRoutes.createStory),
+                icon: const Icon(Icons.auto_awesome),
+                label: const Text('Create a story'),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
                 onPressed: () => context.go(AppRoutes.addChild),
                 icon: const Icon(Icons.add),
                 label: const Text('Add a reader'),

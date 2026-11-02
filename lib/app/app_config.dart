@@ -28,6 +28,10 @@ class AppConfig {
   static const int scenesPerStory = 6;
   static const int imageSteps = 4;
 
+  // ── Story prompt length (FR-STORY-05) ──
+  static const int minPromptLength = 15;
+  static const int maxPromptLength = 300;
+
   /// True when all keys were passed with --dart-define-from-file.
   static bool get hasAllKeys {
     return groqApiKey.isNotEmpty &&

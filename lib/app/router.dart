@@ -9,6 +9,8 @@ import '../features/children/screens/add_child_screen.dart';
 import '../features/children/screens/parent_home_screen.dart';
 import '../features/children/screens/who_is_reading_screen.dart';
 import '../features/reading/screens/path_map_screen.dart';
+import '../features/stories/screens/create_story_screen.dart';
+import '../features/stories/screens/story_generating_screen.dart';
 import 'providers.dart';
 
 /// Paths of every screen, so no screen types a path by hand.
@@ -20,9 +22,16 @@ class AppRoutes {
   static const String addChild = '/add-child';
   static const String whoIsReading = '/who';
   static const String pathMap = '/path';
+  static const String createStory = '/create-story';
+  static const String storyGenerating = '/story-generating';
 
   /// Screens only an unlocked parent may open (SRS D7).
-  static const List<String> parentArea = [parentHome, addChild];
+  static const List<String> parentArea = [
+    parentHome,
+    addChild,
+    createStory,
+    storyGenerating,
+  ];
 }
 
 /// Builds the router with two guards: sign-in (FR-AUTH-03) and parental gate (FR-AUTH-04).
@@ -91,6 +100,14 @@ GoRouter buildRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.pathMap,
         builder: (context, state) => const PathMapScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.createStory,
+        builder: (context, state) => const CreateStoryScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.storyGenerating,
+        builder: (context, state) => const StoryGeneratingScreen(),
       ),
     ],
   );

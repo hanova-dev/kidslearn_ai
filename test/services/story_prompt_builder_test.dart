@@ -92,6 +92,20 @@ void main() {
       expect(message.toLowerCase(), isNot(contains('zayan')));
     });
 
+    test('a value with no text leaves out the Situation line', () {
+      final prompt = StoryPromptBuilder.build(
+        parentText: '',
+        value: 'Kindness',
+        child: makeChild('Zayan'),
+        buddyName: 'Mango',
+        buddyAnimal: 'fox',
+      );
+      final message = StoryPromptBuilder.userMessage(prompt);
+
+      expect(message, contains('Lesson: Kindness.'));
+      expect(message, isNot(contains('Situation')));
+    });
+
     test('the system prompt keeps stories gentle and age-appropriate', () {
       final rules = StoryPromptBuilder.systemPrompt.toLowerCase();
 
