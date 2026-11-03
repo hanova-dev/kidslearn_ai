@@ -14,6 +14,7 @@ class FakeIllustrator implements IllustrationService {
   final Set<String> failPrompts;
 
   final List<String> drawnPrompts = [];
+  final List<String> drawnSheets = [];
 
   @override
   Future<SceneImage> renderScene(
@@ -25,6 +26,7 @@ class FakeIllustrator implements IllustrationService {
       throw const IllustrationFailure('The picture helper is busy.');
     }
     drawnPrompts.add(scenePrompt);
+    drawnSheets.add(characterSheet);
     return SceneImage(
       bytes: Uint8List.fromList([1, 2, 3]),
       source: source,

@@ -37,7 +37,7 @@ class FakeStoryGenerator implements StoryGenerationService {
     return NarrativeResult(
       title: '${prompt.buddyName} Shares the Ball',
       moralValue: 'Sharing',
-      characterSheet: 'A small orange fox with a blue scarf.',
+      characterSheet: 'Mango is a small orange fox with a blue scarf.',
       scenes: const [
         NarrativeScene(text: 'Mango has a red ball.', imagePrompt: 'a ball'),
         NarrativeScene(text: 'Mango gives the ball.', imagePrompt: 'giving'),

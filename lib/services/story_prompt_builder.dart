@@ -62,6 +62,12 @@ class StoryPromptBuilder {
     );
   }
 
+  // ── Picture prompt text (no buddy name) ──
+  /// Replaces the buddy name with `the <animal>`, so FLUX does not write the name in the picture.
+  static String imageText(String text, StoryPrompt prompt) {
+    return redactName(text, prompt.buddyName, 'the ${prompt.buddyAnimal}');
+  }
+
   // ── Message text sent to the model ──
   /// The user message: hero, lesson and situation, one per line (empty parts are left out).
   static String userMessage(StoryPrompt prompt) {

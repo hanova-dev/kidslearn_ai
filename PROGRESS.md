@@ -38,7 +38,7 @@ Last update: 2 Nov 2026 (M3 task 1: drawing scenes). Emulator test evidence: not
 ## M3 — Illustration (Hanan)
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
-| FR-ILLUS-01 | IllustrationService → FluxIllustrator + character sheet | In progress | Style text + character sheet + scene, no seed (decisions 012, 020), 7 mocked tests. **Emulator 2 Nov:** "Mango Tries New Food", 6 FLUX pictures in ~16 s, same fox in each. Issue: FLUX sometimes writes "Mango" on the picture. Waiting for quiz |
+| FR-ILLUS-01 | IllustrationService → FluxIllustrator + character sheet | In progress | Style text + character sheet + scene, no seed (decisions 012, 020), 7 mocked tests. **Emulator 2 Nov:** "Mango Tries New Food", 6 FLUX pictures in ~16 s, same fox in each. Issue: FLUX wrote "Mango" on 3 of 6 pictures. Fix (decision 021): buddy name replaced by "the fox" in picture prompts + "wordless picture" style text. Direct API test: 0 of 6 with text; unit-tested. **Emulator 3 Nov:** "Mango Tries a New Taste", 6 FLUX pictures, none with text. Waiting for quiz |
 | FR-ILLUS-02 | Image saved as file, path in SQLite | In progress | ImageFileStore + saveSceneImage, tested. **Emulator 2 Nov:** 6 JPG files (236–561 KB) in app_flutter/story_images, paths + 'FLUX' in scenes. Waiting for quiz |
 | FR-ILLUS-03 | Show scenes progressively | In progress | Story generating: "Drawing scene N of 6" + thumbnails. **Emulator 2 Nov:** seen at scene 4 of 6 with 3 thumbnails. Waiting for quiz |
 | FR-ILLUS-04 | Retry one failed scene | In progress | FluxIllustrator retries 2 times (1 s, 2 s), 401 not retried; tested with mocks. Parent "retry pictures later" comes with preview (task 2). Waiting for quiz |

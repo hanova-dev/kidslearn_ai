@@ -106,6 +106,21 @@ void main() {
       expect(message, isNot(contains('Situation')));
     });
 
+    test('imageText swaps the buddy name for the animal', () {
+      final prompt = StoryPromptBuilder.build(
+        parentText: '',
+        value: 'Kindness',
+        child: makeChild('Zayan'),
+        buddyName: 'Mango',
+        buddyAnimal: 'fox',
+      );
+
+      expect(
+        StoryPromptBuilder.imageText('Mango hugs a friend.', prompt),
+        'the fox hugs a friend.',
+      );
+    });
+
     test('the system prompt keeps stories gentle and age-appropriate', () {
       final rules = StoryPromptBuilder.systemPrompt.toLowerCase();
 

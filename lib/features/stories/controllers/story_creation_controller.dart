@@ -107,15 +107,20 @@ class StoryCreationController extends Notifier<StoryCreation> {
   // ── Draw one scene: FLUX first, placeholder if FLUX fails (FR-ILLUS-06) ──
   Future<void> _drawScene(Scene scene, String characterSheet) async {
     final seed = state.story?.seed ?? 0;
+    final scenePrompt = StoryPromptBuilder.imageText(
+      scene.imagePrompt,
+      _prompt!,
+    );
+    final sheet = StoryPromptBuilder.imageText(characterSheet, _prompt!);
     SceneImage image;
     try {
       image = await ref
           .read(illustrationServiceProvider)
-          .renderScene(scene.imagePrompt, characterSheet, seed);
+          .renderScene(scenePrompt, sheet, seed);
     } catch (error) {
       image = await ref
           .read(fallbackIllustrationServiceProvider)
-          .renderScene(scene.imagePrompt, characterSheet, seed);
+          .renderScene(scenePrompt, sheet, seed);
     }
 
     // ── Save image file, path in SQLite (FR-ILLUS-02) ──

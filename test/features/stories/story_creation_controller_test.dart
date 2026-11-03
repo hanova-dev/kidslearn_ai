@@ -127,6 +127,21 @@ void main() {
     expect(generator.prompts.single.buddyAnimal, 'fox');
   });
 
+  // ── Buddy name is kept out of picture prompts (FLUX writes names) ──
+  test('the picture prompt says "the fox", not the buddy name', () async {
+    final flux = FakeIllustrator();
+    final container = makeContainer(FakeStoryGenerator(), flux: flux);
+
+    await container
+        .read(storyCreationControllerProvider.notifier)
+        .create(text: '', value: 'Sharing', child: zayan);
+
+    expect(
+      flux.drawnSheets.first,
+      'the fox is a small orange fox with a blue scarf.',
+    );
+  });
+
   // ── Failure and retry ──
   test('a failure marks FAILED and keeps a plain message', () async {
     final container = makeContainer(

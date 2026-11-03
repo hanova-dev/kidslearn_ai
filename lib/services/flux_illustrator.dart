@@ -26,8 +26,9 @@ class FluxIllustrator implements IllustrationService {
 
   // ── Same style text for every scene (FR-ILLUS-01) ──
   static const String styleText =
-      "Children's picture-book comic style, soft warm colours, "
-      'simple rounded shapes, gentle and friendly, no text or letters.';
+      "Children's picture-book illustration, soft warm colours, "
+      'simple rounded shapes, gentle and friendly. '
+      'A wordless picture: no writing, letters, titles, labels or signatures.';
 
   /// The API accepts at most this many prompt characters.
   static const int maxPromptLength = 2048;

@@ -22,5 +22,5 @@
 - On the emulator (2 Nov) a story took about 16 s with 6 FLUX pictures.
 - With the network cut during drawing, all 6 scenes got placeholders and the story was still READY.
 - Each story uses about 350 of the 10,000 free daily neurons.
-- Problem seen: FLUX sometimes writes the hero's name ("Mango") on the picture, even though the prompt says "no text". To be fixed in a follow-up.
+- Problem seen: FLUX sometimes writes the hero's name ("Mango") on the picture, even though the prompt says "no text". Fixed in decision 021.
 - "Retry pictures later" (FR-ILLUS-06) comes with the preview screen.
