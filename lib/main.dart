@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app/providers.dart';
 import 'app/theme.dart';
 import 'data/local/app_database.dart';
+import 'data/local/sqlite_story_repository.dart';
 
 /// Starts Firebase and the local database, then the KidsLearn AI app.
 Future<void> main() async {
@@ -14,6 +15,9 @@ Future<void> main() async {
 
   // ── Open the SQLite database ──
   final database = await AppDatabase.open();
+
+  // ── Stories stopped by an app close become FAILED (decision 023) ──
+  await SqliteStoryRepository(database).failInterruptedStories();
 
   // ── Start the app inside Riverpod ──
   runApp(

@@ -11,6 +11,7 @@ import '../features/children/screens/who_is_reading_screen.dart';
 import '../features/reading/screens/path_map_screen.dart';
 import '../features/stories/screens/create_story_screen.dart';
 import '../features/stories/screens/story_generating_screen.dart';
+import '../features/stories/screens/story_library_screen.dart';
 import '../features/stories/screens/story_preview_screen.dart';
 import 'providers.dart';
 
@@ -26,6 +27,7 @@ class AppRoutes {
   static const String createStory = '/create-story';
   static const String storyGenerating = '/story-generating';
   static const String storyPreview = '/story-preview';
+  static const String storyLibrary = '/library';
 
   /// The preview path for one story, e.g. `/story-preview?id=story-1`.
   static String storyPreviewOf(String storyId) {
@@ -39,6 +41,7 @@ class AppRoutes {
     createStory,
     storyGenerating,
     storyPreview,
+    storyLibrary,
   ];
 }
 
@@ -121,6 +124,10 @@ GoRouter buildRouter(Ref ref) {
         path: AppRoutes.storyPreview,
         builder: (context, state) =>
             StoryPreviewScreen(storyId: state.uri.queryParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: AppRoutes.storyLibrary,
+        builder: (context, state) => const StoryLibraryScreen(),
       ),
     ],
   );

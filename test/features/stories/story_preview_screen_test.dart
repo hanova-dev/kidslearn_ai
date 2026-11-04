@@ -74,7 +74,7 @@ void main() {
 
     expect(stories.stories.values.single.approved, isTrue);
     expect(find.text('Approved. Zayan can read it.'), findsOneWidget);
-    expect(find.text('Create a story'), findsOneWidget);
+    expect(find.text('Story library'), findsOneWidget);
   });
 
   // ── Delete after a confirm dialog (FR-STORY-07) ──

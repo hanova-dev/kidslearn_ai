@@ -35,7 +35,7 @@ class PreviewActions extends ConsumerWidget {
       SnackBar(content: Text('Approved. ${preview.child.name} can read it.')),
     );
     if (context.mounted) {
-      context.go(AppRoutes.parentHome);
+      context.go(AppRoutes.storyLibrary);
     }
   }
 
@@ -86,7 +86,7 @@ class PreviewActions extends ConsumerWidget {
     }
     messenger.showSnackBar(const SnackBar(content: Text('Story deleted.')));
     if (context.mounted) {
-      context.go(AppRoutes.parentHome);
+      context.go(AppRoutes.storyLibrary);
     }
   }
 

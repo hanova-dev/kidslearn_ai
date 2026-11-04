@@ -96,6 +96,31 @@ class FakeStoryRepository implements StoryRepository {
     return List.of(scenes[storyId] ?? []);
   }
 
+  @override
+  Future<List<Story>> getStoriesForParent(String parentId) async {
+    final list = <Story>[];
+    for (final story in stories.values) {
+      if (story.parentId == parentId) {
+        list.add(story);
+      }
+    }
+    list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return list;
+  }
+
+  @override
+  Future<int> failInterruptedStories() async {
+    var count = 0;
+    for (final story in stories.values.toList()) {
+      if (story.status == StoryStatus.draft ||
+          story.status == StoryStatus.generating) {
+        stories[story.id] = _copy(story, status: StoryStatus.failed);
+        count++;
+      }
+    }
+    return count;
+  }
+
   Story _copy(
     Story story, {
     StoryStatus? status,

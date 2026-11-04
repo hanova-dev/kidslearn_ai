@@ -28,4 +28,10 @@ abstract class StoryRepository {
 
   /// The story's scenes in reading order.
   Future<List<Scene>> getScenes(String storyId);
+
+  /// Every story of one parent, newest first (Story library, design p9).
+  Future<List<Story>> getStoriesForParent(String parentId);
+
+  /// Marks stories left in DRAFT or GENERATING by an app close as FAILED; returns how many (decision 023).
+  Future<int> failInterruptedStories();
 }

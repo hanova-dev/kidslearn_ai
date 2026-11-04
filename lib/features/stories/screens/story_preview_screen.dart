@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/app_colors.dart';
 import '../../../app/router.dart';
 import '../../../core/constants/app_sizes.dart';
+import '../../../data/models/story_status.dart';
 import '../controllers/story_preview.dart';
 import '../controllers/story_preview_controller.dart';
 import 'preview_actions.dart';
@@ -54,18 +55,40 @@ class _SceneList extends StatelessWidget {
           children: [
             IconButton.outlined(
               tooltip: 'Back',
-              onPressed: () => context.go(AppRoutes.parentHome),
+              onPressed: () => context.go(AppRoutes.storyLibrary),
               icon: const Icon(Icons.chevron_left),
             ),
             const SizedBox(width: 12),
-            Expanded(child: Text(story.title, style: textTheme.headlineSmall)),
+            Expanded(
+              child: Text(
+                story.title.isEmpty ? 'New story' : story.title,
+                style: textTheme.headlineSmall,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 12),
         Text(
-          'For ${preview.child.name} · Lesson: ${story.moralValue}',
+          story.moralValue.isEmpty
+              ? 'For ${preview.child.name}'
+              : 'For ${preview.child.name} · Lesson: ${story.moralValue}',
           style: textTheme.bodyMedium?.copyWith(color: colors.inkMuted),
         ),
+        if (story.status == StoryStatus.failed) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(Icons.pause_circle_outline, color: colors.coralSoft),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'This story stopped before it was finished. '
+                  'Tap "Make a new version" to try again.',
+                ),
+              ),
+            ],
+          ),
+        ],
         if (story.approved) ...[
           const SizedBox(height: 8),
           Row(
@@ -167,8 +190,8 @@ class _StoryMissing extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           FilledButton(
-            onPressed: () => context.go(AppRoutes.parentHome),
-            child: const Text('Back to home'),
+            onPressed: () => context.go(AppRoutes.storyLibrary),
+            child: const Text('Back to library'),
           ),
         ],
       ),

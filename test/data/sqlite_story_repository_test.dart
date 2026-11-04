@@ -163,4 +163,48 @@ void main() {
   test('an unknown story id gives null', () async {
     expect(await repository.getStory('nope'), isNull);
   });
+
+  // ── Story library (design p9) ──
+  test(
+    'getStoriesForParent gives the stories of one parent, newest first',
+    () async {
+      await repository.saveDraft(makeDraft('old'));
+      await repository.saveDraft(
+        Story.fromMap({
+          ...makeDraft('new').toMap(),
+          'created_at': DateTime(2026, 11, 4).millisecondsSinceEpoch,
+        }),
+      );
+      await repository.saveDraft(
+        Story.fromMap({...makeDraft('other').toMap(), 'parent_id': 'parent-2'}),
+      );
+
+      final stories = await repository.getStoriesForParent('parent-1');
+
+      expect(stories.map((story) => story.id).toList(), ['new', 'old']);
+    },
+  );
+
+  // ── Stories stopped by an app close (decision 023) ──
+  test(
+    'failInterruptedStories turns DRAFT and GENERATING into FAILED',
+    () async {
+      await repository.saveDraft(makeDraft('draft'));
+      await repository.saveDraft(makeDraft('generating'));
+      await repository.updateStatus('generating', StoryStatus.generating);
+      await repository.saveDraft(makeDraft('ready'));
+      await repository.updateStatus('ready', StoryStatus.generating);
+      await repository.updateStatus('ready', StoryStatus.ready);
+
+      final count = await repository.failInterruptedStories();
+
+      expect(count, 2);
+      expect((await repository.getStory('draft'))!.status, StoryStatus.failed);
+      expect(
+        (await repository.getStory('generating'))!.status,
+        StoryStatus.failed,
+      );
+      expect((await repository.getStory('ready'))!.status, StoryStatus.ready);
+    },
+  );
 }

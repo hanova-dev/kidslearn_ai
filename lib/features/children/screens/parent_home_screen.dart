@@ -8,6 +8,7 @@ import '../../../app/router.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/buddies.dart';
 import '../../../core/widgets/buddy_face.dart';
+import '../../../core/widgets/parent_nav_bar.dart';
 import '../../../data/models/child_profile.dart';
 import '../../auth/controllers/parent_unlock.dart';
 import '../controllers/children_provider.dart';
@@ -36,6 +37,7 @@ class ParentHomeScreen extends ConsumerWidget {
     final children = ref.watch(childrenProvider);
 
     return Scaffold(
+      bottomNavigationBar: const ParentNavBar(currentIndex: 0),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),

@@ -134,4 +134,30 @@ class SqliteStoryRepository implements StoryRepository {
     }
     return scenes;
   }
+
+  @override
+  Future<List<Story>> getStoriesForParent(String parentId) async {
+    final rows = await _db.query(
+      'stories',
+      where: 'parent_id = ?',
+      whereArgs: [parentId],
+      orderBy: 'created_at DESC',
+    );
+    final stories = <Story>[];
+    for (final row in rows) {
+      stories.add(Story.fromMap(row));
+    }
+    return stories;
+  }
+
+  // ── Mark stories stopped by an app close as FAILED ──
+  @override
+  Future<int> failInterruptedStories() async {
+    return _db.update(
+      'stories',
+      {'status': StoryStatus.failed.dbValue},
+      where: 'status = ? OR status = ?',
+      whereArgs: [StoryStatus.draft.dbValue, StoryStatus.generating.dbValue],
+    );
+  }
 }
