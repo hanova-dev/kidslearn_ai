@@ -76,6 +76,17 @@ class FakeStoryRepository implements StoryRepository {
   }
 
   @override
+  Future<void> setApproved(String storyId, bool approved) async {
+    stories[storyId] = _copy(stories[storyId]!, approved: approved);
+  }
+
+  @override
+  Future<void> deleteStory(String storyId) async {
+    stories.remove(storyId);
+    scenes.remove(storyId);
+  }
+
+  @override
   Future<Story?> getStory(String storyId) async {
     return stories[storyId];
   }
@@ -90,6 +101,7 @@ class FakeStoryRepository implements StoryRepository {
     StoryStatus? status,
     String? title,
     String? moralValue,
+    bool? approved,
   }) {
     return Story(
       id: story.id,
@@ -103,7 +115,7 @@ class FakeStoryRepository implements StoryRepository {
       characterSheet: story.characterSheet,
       seed: story.seed,
       status: status ?? story.status,
-      approved: story.approved,
+      approved: approved ?? story.approved,
       createdAt: story.createdAt,
     );
   }

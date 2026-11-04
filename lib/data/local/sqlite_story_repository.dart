@@ -86,6 +86,26 @@ class SqliteStoryRepository implements StoryRepository {
     );
   }
 
+  // ── Approve ──
+  @override
+  Future<void> setApproved(String storyId, bool approved) async {
+    await _db.update(
+      'stories',
+      {'approved': approved ? 1 : 0},
+      where: 'story_id = ?',
+      whereArgs: [storyId],
+    );
+  }
+
+  // ── Delete story and its scenes in one transaction ──
+  @override
+  Future<void> deleteStory(String storyId) async {
+    await _db.transaction((txn) async {
+      await txn.delete('scenes', where: 'story_id = ?', whereArgs: [storyId]);
+      await txn.delete('stories', where: 'story_id = ?', whereArgs: [storyId]);
+    });
+  }
+
   // ── Load ──
   @override
   Future<Story?> getStory(String storyId) async {

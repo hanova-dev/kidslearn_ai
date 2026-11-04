@@ -24,4 +24,12 @@ class ImageFileStore {
     await file.writeAsBytes(image.bytes, flush: true);
     return file.path;
   }
+
+  /// Deletes the picture file at [path], if it is still there.
+  Future<void> delete(String path) async {
+    final file = File(path);
+    if (await file.exists()) {
+      await file.delete();
+    }
+  }
 }

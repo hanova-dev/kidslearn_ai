@@ -17,6 +17,12 @@ abstract class StoryRepository {
   /// Records where a scene's picture file is and who drew it (FR-ILLUS-02).
   Future<void> saveSceneImage(String sceneId, String imagePath, String source);
 
+  /// Marks the story approved or not approved; only approved stories reach the child (FR-STORY-07).
+  Future<void> setApproved(String storyId, bool approved);
+
+  /// Removes the story and its scenes; the caller deletes the picture files (FR-STORY-07).
+  Future<void> deleteStory(String storyId);
+
   /// One story, or null if it does not exist.
   Future<Story?> getStory(String storyId);
 

@@ -4,17 +4,16 @@ import '../../../app/providers.dart';
 import '../../../core/constants/buddies.dart';
 import '../../../core/errors/story_generation_failure.dart';
 import '../../../data/models/child_profile.dart';
-import '../../../data/models/scene.dart';
-import '../../../data/models/scene_image.dart';
 import '../../../data/models/story.dart';
 import '../../../data/models/story_prompt.dart';
 import '../../../data/models/story_status.dart';
 import '../../../services/story_prompt_builder.dart';
+import 'scene_drawer.dart';
 import 'story_creation.dart';
 
 /// Creates one story: DRAFT → GENERATING (write, then draw) → READY or FAILED.
 ///
-/// FR-STORY-03, FR-STORY-04, FR-ILLUS-01..04, FR-ILLUS-06.
+/// FR-STORY-03, FR-STORY-04, FR-STORY-06, FR-ILLUS-01..04, FR-ILLUS-06.
 class StoryCreationController extends Notifier<StoryCreation> {
   StoryPrompt? _prompt;
 
@@ -57,16 +56,32 @@ class StoryCreationController extends Notifier<StoryCreation> {
     }
 
     // ── Build the redacted prompt (no real name) ──
-    final buddy = Buddies.byId(child.buddyId);
-    _prompt = StoryPromptBuilder.build(
-      parentText: text,
-      value: value,
-      child: child,
-      buddyName: buddy.name,
-      buddyAnimal: buddy.animal,
-    );
+    _prompt = _buildPrompt(text, value, child);
     state = StoryCreation(step: CreationStep.writing, story: draft);
     await _writeAndDraw(draft.id);
+  }
+
+  /// Writes and draws [story] again from its saved prompt, replacing the old version (FR-STORY-06).
+  Future<void> regenerate(Story story, ChildProfile child) async {
+    state = StoryCreation(step: CreationStep.writing, story: story);
+
+    // ── Remove the old pictures and the approval ──
+    final repository = ref.read(storyRepositoryProvider);
+    try {
+      for (final scene in await repository.getScenes(story.id)) {
+        final path = scene.imagePath;
+        if (path != null) {
+          await ref.read(imageFileStoreProvider).delete(path);
+        }
+      }
+      await repository.setApproved(story.id, false);
+    } catch (error) {
+      _fail('Could not start a new version. Please try again.');
+      return;
+    }
+
+    _prompt = _buildPrompt(story.promptText, story.promptValue, child);
+    await _writeAndDraw(story.id);
   }
 
   /// Tries the last failed story again with the same prompt (FR-STORY-04).
@@ -91,8 +106,11 @@ class StoryCreationController extends Notifier<StoryCreation> {
       await _showProgress(storyId, CreationStep.drawing);
 
       final scenes = await repository.getScenes(storyId);
+      final seed = state.story?.seed ?? 0;
       for (final scene in scenes) {
-        await _drawScene(scene, narrative.characterSheet);
+        await ref
+            .read(sceneDrawerProvider)
+            .draw(scene, narrative.characterSheet, _prompt!, seed);
         await _showProgress(storyId, CreationStep.drawing);
       }
 
@@ -104,30 +122,16 @@ class StoryCreationController extends Notifier<StoryCreation> {
     }
   }
 
-  // ── Draw one scene: FLUX first, placeholder if FLUX fails (FR-ILLUS-06) ──
-  Future<void> _drawScene(Scene scene, String characterSheet) async {
-    final seed = state.story?.seed ?? 0;
-    final scenePrompt = StoryPromptBuilder.imageText(
-      scene.imagePrompt,
-      _prompt!,
+  // ── Build the redacted prompt from the parent's words ──
+  StoryPrompt _buildPrompt(String text, String value, ChildProfile child) {
+    final buddy = Buddies.byId(child.buddyId);
+    return StoryPromptBuilder.build(
+      parentText: text,
+      value: value,
+      child: child,
+      buddyName: buddy.name,
+      buddyAnimal: buddy.animal,
     );
-    final sheet = StoryPromptBuilder.imageText(characterSheet, _prompt!);
-    SceneImage image;
-    try {
-      image = await ref
-          .read(illustrationServiceProvider)
-          .renderScene(scenePrompt, sheet, seed);
-    } catch (error) {
-      image = await ref
-          .read(fallbackIllustrationServiceProvider)
-          .renderScene(scenePrompt, sheet, seed);
-    }
-
-    // ── Save image file, path in SQLite (FR-ILLUS-02) ──
-    final path = await ref.read(imageFileStoreProvider).save(scene.id, image);
-    await ref
-        .read(storyRepositoryProvider)
-        .saveSceneImage(scene.id, path, image.source);
   }
 
   // ── Reload story and scenes so the screen shows the latest ──

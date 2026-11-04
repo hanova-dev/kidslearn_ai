@@ -31,8 +31,8 @@ Last update: 2 Nov 2026 (M3 task 1: drawing scenes). Emulator test evidence: not
 | FR-STORY-03 | Cache DRAFT in SQLite before network | In progress | StoryCreationController saves DRAFT before the Groq call (test checks the order). **Emulator 2 Nov:** offline story row saved with prompt_value 'Kindness'. Waiting for quiz (decisions 018, 019) |
 | FR-STORY-04 | DRAFT / GENERATING / READY / FAILED + retry | In progress | Story generating screen (p8) + Try again. **Emulator 2 Nov:** writing screen seen; offline → "No internet…" + row FAILED; online + Try again → same story READY, 6 scenes. READY now only after all pictures (decision 020). Waiting for quiz |
 | FR-STORY-05 | Reject too-short prompts | In progress | StoryInputCheck, 15–300 letters in AppConfig, 6 tests. **Emulator 2 Nov:** empty → "Tell us what the story should teach…"; "Sara hits" → "Please write a little more…"; nothing sent. Waiting for quiz |
-| FR-STORY-06 | Regenerate from same prompt | Not started | |
-| FR-STORY-07 | Parent preview and approve | Not started | No design page; decision 011 |
+| FR-STORY-06 | Regenerate from same prompt | In progress | "Make a new version" on the preview replaces text + pictures of the same story, keeps the prompt, clears approval (decision 022). Unit + widget tested. **Emulator 3 Nov:** "Sky's Gentle Bedtime" got 6 new sentences and 6 new FLUX files, same id, no extra story. Waiting for quiz |
+| FR-STORY-07 | Parent preview and approve | In progress | Story preview screen: scene list, Approve, Make a new version, Delete with confirm (decisions 011, 022). Unit + widget tested. **Emulator 3 Nov:** Approve → approved = 1 and "Approved. Sara can read it."; Delete → 0 rows, 0 files, "Story deleted." Night mode not checked yet. Waiting for quiz |
 | FR-STORY-08 | Real name → buddy name in prompts | In progress | StoryPromptBuilder.redactName, 8 tests + controller test (decision 017). **Emulator 2 Nov:** prompt "Sara does not want…" → story about Sky; "Sara" not found in title, character sheet or scenes. Waiting for quiz |
 
 ## M3 — Illustration (Hanan)
@@ -43,7 +43,7 @@ Last update: 2 Nov 2026 (M3 task 1: drawing scenes). Emulator test evidence: not
 | FR-ILLUS-03 | Show scenes progressively | In progress | Story generating: "Drawing scene N of 6" + thumbnails. **Emulator 2 Nov:** seen at scene 4 of 6 with 3 thumbnails. Waiting for quiz |
 | FR-ILLUS-04 | Retry one failed scene | In progress | FluxIllustrator retries 2 times (1 s, 2 s), 401 not retried; tested with mocks. Parent "retry pictures later" comes with preview (task 2). Waiting for quiz |
 | FR-ILLUS-05 | Choose 512 / 1024 resolution | Dropped | Not supported by the API (decision 012) |
-| FR-ILLUS-06 | PlaceholderIllustrator fallback | In progress | PNG from SceneryPainter (decision 010), per-scene fallback (decision 020). **Emulator 2 Nov:** network cut while drawing → 6 PLACEHOLDER pngs, story still READY, note shown. Waiting for quiz |
+| FR-ILLUS-06 | PlaceholderIllustrator fallback | In progress | PNG from SceneryPainter (decision 010), per-scene fallback (decision 020). **Emulator 2 Nov:** network cut while drawing → 6 PLACEHOLDER pngs, story still READY, note shown. **Retry later (3 Nov):** "Draw pictures again" on the preview turned 4 PLACEHOLDER scenes into FLUX and removed the old pngs (decision 022). Waiting for quiz |
 
 ## M4 — Speech-to-text (Hanan)
 | FR | Requirement (short) | Status | Notes |

@@ -179,4 +179,34 @@ void main() {
       CreationStep.ready,
     );
   });
+
+  // ── New version from the same prompt (FR-STORY-06) ──
+  test(
+    'regenerate replaces pictures, clears approval, keeps the prompt',
+    () async {
+      final generator = FakeStoryGenerator();
+      final container = makeContainer(generator);
+      final controller = container.read(
+        storyCreationControllerProvider.notifier,
+      );
+      await controller.create(
+        text: 'Zayan will not share',
+        value: 'Sharing',
+        child: zayan,
+      );
+      final story = stories.stories.values.single;
+      await stories.setApproved(story.id, true);
+      final oldPaths = List.of(files.savedPaths);
+
+      await controller.regenerate(stories.stories[story.id]!, zayan);
+
+      expect(stories.stories.length, 1);
+      expect(stories.stories[story.id]!.approved, isFalse);
+      expect(stories.stories[story.id]!.promptText, 'Zayan will not share');
+      expect(files.deletedPaths, oldPaths);
+      expect(generator.prompts[1].behaviour, generator.prompts[0].behaviour);
+      expect(stories.statusHistory.last, StoryStatus.ready);
+      expect(container.read(storyCreationControllerProvider).drawnCount, 3);
+    },
+  );
 }

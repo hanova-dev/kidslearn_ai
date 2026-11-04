@@ -42,7 +42,7 @@ class StoryGeneratingScreen extends ConsumerWidget {
         drawingLabel = 'Drawing scene $next of $total';
       case CreationStep.ready:
         title = 'Your story is ready!';
-        subtitle = 'You can preview and approve it soon.';
+        subtitle = 'Read it first, then approve it for your child.';
         drawingLook = StepLook.done;
         drawingLabel = 'All $total pictures drawn';
       case CreationStep.failed:
@@ -58,34 +58,50 @@ class StoryGeneratingScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ── Lumi and title ──
-              const SizedBox(height: 24),
-              const Center(child: LumiMascot(size: 110)),
-              const SizedBox(height: 20),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 8),
-              Text(subtitle, textAlign: TextAlign.center),
-              const SizedBox(height: 24),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // ── Lumi and title ──
+                      const SizedBox(height: 24),
+                      const Center(child: LumiMascot(size: 110)),
+                      const SizedBox(height: 20),
+                      Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        style: textTheme.headlineSmall,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(subtitle, textAlign: TextAlign.center),
+                      const SizedBox(height: 24),
 
-              // ── Progress steps and drawn scenes ──
-              _StepsCard(
-                writingLook: writingLook,
-                drawingLook: drawingLook,
-                drawingLabel: drawingLabel,
+                      // ── Progress steps and drawn scenes ──
+                      _StepsCard(
+                        writingLook: writingLook,
+                        drawingLook: drawingLook,
+                        drawingLabel: drawingLabel,
+                      ),
+                      const SizedBox(height: 16),
+                      SceneThumbnails(scenes: creation.scenes),
+                      if (creation.step == CreationStep.ready) ...[
+                        const SizedBox(height: 16),
+                        _ReadyStoryCard(creation: creation),
+                      ],
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
-              SceneThumbnails(scenes: creation.scenes),
-              if (creation.step == CreationStep.ready) ...[
-                const SizedBox(height: 16),
-                _ReadyStoryCard(creation: creation),
-              ],
-              const Spacer(),
 
               // ── Actions ──
+              if (creation.step == CreationStep.ready)
+                FilledButton.icon(
+                  onPressed: () =>
+                      context.go(AppRoutes.storyPreviewOf(creation.story!.id)),
+                  icon: const Icon(Icons.menu_book),
+                  label: const Text('Preview story'),
+                ),
               if (creation.step == CreationStep.failed)
                 FilledButton.icon(
                   onPressed: () => ref
@@ -163,8 +179,9 @@ class _ReadyStoryCard extends StatelessWidget {
           if (creation.placeholderCount > 0) ...[
             const SizedBox(height: 8),
             Text(
-              '${creation.placeholderCount} pictures use a simple picture '
-              'for now. You can try drawing them again later.',
+              'Simple pictures: ${creation.placeholderCount} of '
+              '${creation.scenes.length}. You can draw them again in the '
+              'preview.',
               style: textTheme.bodySmall?.copyWith(color: colors.inkMuted),
             ),
           ],

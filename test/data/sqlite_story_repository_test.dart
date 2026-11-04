@@ -137,6 +137,29 @@ void main() {
     expect(scenes[1].imageSource, 'FLUX');
   });
 
+  // ── Approve and delete (FR-STORY-07) ──
+  test('setApproved stores the approval', () async {
+    await repository.saveDraft(makeDraft('s1'));
+
+    await repository.setApproved('s1', true);
+    expect((await repository.getStory('s1'))!.approved, isTrue);
+
+    await repository.setApproved('s1', false);
+    expect((await repository.getStory('s1'))!.approved, isFalse);
+  });
+
+  test('deleteStory removes the story and its scenes only', () async {
+    await repository.saveDraft(makeDraft('s1'));
+    await repository.saveNarrative('s1', makeNarrative(2));
+    await repository.saveDraft(makeDraft('s2'));
+
+    await repository.deleteStory('s1');
+
+    expect(await repository.getStory('s1'), isNull);
+    expect(await repository.getScenes('s1'), isEmpty);
+    expect(await repository.getStory('s2'), isNotNull);
+  });
+
   test('an unknown story id gives null', () async {
     expect(await repository.getStory('nope'), isNull);
   });

@@ -11,6 +11,7 @@ import '../features/children/screens/who_is_reading_screen.dart';
 import '../features/reading/screens/path_map_screen.dart';
 import '../features/stories/screens/create_story_screen.dart';
 import '../features/stories/screens/story_generating_screen.dart';
+import '../features/stories/screens/story_preview_screen.dart';
 import 'providers.dart';
 
 /// Paths of every screen, so no screen types a path by hand.
@@ -24,6 +25,12 @@ class AppRoutes {
   static const String pathMap = '/path';
   static const String createStory = '/create-story';
   static const String storyGenerating = '/story-generating';
+  static const String storyPreview = '/story-preview';
+
+  /// The preview path for one story, e.g. `/story-preview?id=story-1`.
+  static String storyPreviewOf(String storyId) {
+    return '$storyPreview?id=$storyId';
+  }
 
   /// Screens only an unlocked parent may open (SRS D7).
   static const List<String> parentArea = [
@@ -31,6 +38,7 @@ class AppRoutes {
     addChild,
     createStory,
     storyGenerating,
+    storyPreview,
   ];
 }
 
@@ -108,6 +116,11 @@ GoRouter buildRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.storyGenerating,
         builder: (context, state) => const StoryGeneratingScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.storyPreview,
+        builder: (context, state) =>
+            StoryPreviewScreen(storyId: state.uri.queryParameters['id'] ?? ''),
       ),
     ],
   );
