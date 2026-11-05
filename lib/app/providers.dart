@@ -11,11 +11,13 @@ import '../data/local/sqlite_story_repository.dart';
 import '../data/remote/firebase_auth_repository.dart';
 import '../data/reading_session_repository.dart';
 import '../data/story_repository.dart';
+import '../services/device_tts_narrator.dart';
 import '../services/flux_illustrator.dart';
 import '../services/groq_story_generator.dart';
 import '../services/illustration_service.dart';
 import '../services/placeholder_illustrator.dart';
 import '../services/story_generation_service.dart';
+import '../services/text_to_speech_service.dart';
 import 'app_config.dart';
 import 'router.dart';
 
@@ -71,6 +73,11 @@ final fallbackIllustrationServiceProvider = Provider<IllustrationService>((
   ref,
 ) {
   return PlaceholderIllustrator();
+});
+
+/// Who reads the story aloud (the phone's own voice, FR-TTS-01).
+final textToSpeechServiceProvider = Provider<TextToSpeechService>((ref) {
+  return DeviceTtsNarrator();
 });
 
 /// Where scene pictures are saved as files (FR-ILLUS-02).

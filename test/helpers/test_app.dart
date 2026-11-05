@@ -12,6 +12,7 @@ import '../fakes/fake_image_file_store.dart';
 import '../fakes/fake_reading_session_repository.dart';
 import '../fakes/fake_story_generator.dart';
 import '../fakes/fake_story_repository.dart';
+import '../fakes/fake_text_to_speech.dart';
 
 /// Makes the test screen the size of a typical Android phone (360 × 800 dp).
 void usePhoneScreen(WidgetTester tester) {
@@ -26,6 +27,7 @@ Widget buildTestApp({
   FakeChildRepository? children,
   FakeStoryRepository? stories,
   FakeReadingSessionRepository? sessions,
+  FakeTextToSpeech? voice,
   FakeStoryGenerator? storyGenerator,
   FakeIllustrator? illustrator,
   bool parentUnlocked = false,
@@ -52,6 +54,9 @@ Widget buildTestApp({
         FakeIllustrator(source: 'PLACEHOLDER'),
       ),
       imageFileStoreProvider.overrideWithValue(FakeImageFileStore()),
+      textToSpeechServiceProvider.overrideWithValue(
+        voice ?? FakeTextToSpeech(),
+      ),
       if (parentUnlocked) parentUnlockProvider.overrideWith(_StartUnlocked.new),
     ],
     child: const KidsLearnApp(),

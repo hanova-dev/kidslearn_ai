@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/app_colors.dart';
 import '../../../app/router.dart';
-import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/buddies.dart';
 import '../../../core/widgets/buddy_face.dart';
+import '../../../core/widgets/child_home_button.dart';
 import '../../../core/widgets/scenery_background.dart';
 import '../../children/controllers/active_child.dart';
 import '../controllers/path_map_provider.dart';
@@ -18,7 +17,7 @@ import 'path_top_bar.dart';
 class PathMapScreen extends ConsumerWidget {
   const PathMapScreen({super.key});
 
-  // ── Open a story (the story viewer comes in the next task) ──
+  // ── Open a story, or explain why it is locked ──
   void _openStory(BuildContext context, PathNode node) {
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
@@ -28,14 +27,11 @@ class PathMapScreen extends ConsumerWidget {
       );
       return;
     }
-    messenger.showSnackBar(
-      SnackBar(content: Text('"${node.story.title}" opens soon.')),
-    );
+    context.go(AppRoutes.storyViewerOf(node.story.id));
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = AppColors.of(context);
     final child = ref.watch(activeChildProvider);
     final path = ref.watch(pathMapProvider);
     var buddy = Buddies.mango;
@@ -86,19 +82,7 @@ class PathMapScreen extends ConsumerWidget {
 
       // ── Home button (fixed bottom-centre, SRS 10.9) ──
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: SizedBox(
-        width: AppSizes.listenerTouchTarget,
-        height: AppSizes.listenerTouchTarget,
-        child: FloatingActionButton(
-          heroTag: 'home',
-          backgroundColor: colors.sunshine,
-          foregroundColor: AppColors.day.ink,
-          tooltip: 'Home',
-          shape: const CircleBorder(),
-          onPressed: () => context.go(AppRoutes.whoIsReading),
-          child: const Icon(Icons.home_outlined, size: 30),
-        ),
-      ),
+      floatingActionButton: const ChildHomeButton(),
     );
   }
 }

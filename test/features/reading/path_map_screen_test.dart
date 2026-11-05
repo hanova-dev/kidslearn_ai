@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kidslearn_ai/data/models/age_group.dart';
 import 'package:kidslearn_ai/data/models/child_profile.dart';
 import 'package:kidslearn_ai/data/models/reading_session.dart';
+import 'package:kidslearn_ai/data/models/scene.dart';
 import 'package:kidslearn_ai/data/models/story.dart';
 import 'package:kidslearn_ai/data/models/story_status.dart';
 
@@ -53,6 +54,17 @@ void main() {
     final stories = FakeStoryRepository();
     for (final story in storyList) {
       stories.stories[story.id] = story;
+      stories.scenes[story.id] = [
+        Scene(
+          id: '${story.id}-scene-1',
+          storyId: story.id,
+          sequenceNumber: 1,
+          text: 'Mango wakes up.',
+          imagePrompt: '',
+          imagePath: null,
+          imageSource: null,
+        ),
+      ];
     }
     final sessions = FakeReadingSessionRepository();
     for (final storyId in finishedIds) {
@@ -106,25 +118,26 @@ void main() {
     expect(find.text('7'), findsOneWidget);
   });
 
-  testWidgets('a locked circle asks to finish the glowing story first', (
-    tester,
-  ) async {
-    await openPath(
-      tester,
-      storyList: [
-        makeStory('s1', 'Mango Shares', 1),
-        makeStory('s2', 'Honest Hana', 2),
-      ],
-    );
+  testWidgets(
+    'a locked circle says to finish the glowing story; the current one opens',
+    (tester) async {
+      await openPath(
+        tester,
+        storyList: [
+          makeStory('s1', 'Mango Shares', 1),
+          makeStory('s2', 'Honest Hana', 2),
+        ],
+      );
 
-    await tester.tap(find.bySemanticsLabel('Story 2, locked'));
-    await tester.pump();
-    expect(find.text('Finish the glowing story first!'), findsOneWidget);
+      await tester.tap(find.bySemanticsLabel('Story 2, locked'));
+      await tester.pump();
+      expect(find.text('Finish the glowing story first!'), findsOneWidget);
 
-    await tester.tap(find.bySemanticsLabel('Story 1, tap to play'));
-    await tester.pump();
-    expect(find.text('"Mango Shares" opens soon.'), findsOneWidget);
-  });
+      await tester.tap(find.bySemanticsLabel('Story 1, tap to play'));
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Read aloud'), findsOneWidget);
+    },
+  );
 
   // ── No approved stories yet ──
   testWidgets('with no stories the buddy asks for a grown-up; Back returns', (

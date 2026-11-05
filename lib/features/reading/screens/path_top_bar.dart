@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
+import '../../../core/widgets/round_icon_button.dart';
 
 /// Top of the path map: Back on the left, the child's stars in the middle (design p15).
 class PathTopBar extends StatelessWidget {
@@ -18,19 +19,10 @@ class PathTopBar extends StatelessWidget {
       child: Row(
         children: [
           // ── Back button ──
-          SizedBox(
-            width: AppSizes.listenerTouchTarget,
-            height: AppSizes.listenerTouchTarget,
-            child: IconButton(
-              tooltip: 'Back',
-              style: IconButton.styleFrom(
-                backgroundColor: colors.surface,
-                foregroundColor: colors.ink,
-                side: BorderSide(color: colors.border, width: 2),
-              ),
-              onPressed: onBack,
-              icon: const Icon(Icons.arrow_back_ios_new, size: 26),
-            ),
+          RoundIconButton(
+            icon: Icons.arrow_back_ios_new,
+            tooltip: 'Back',
+            onPressed: onBack,
           ),
           const Spacer(),
 

@@ -1,7 +1,7 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 5 Nov 2026 (Week 3 task 4: Path map). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/ and m6_path_map_2026-11-05/.
+Last update: 5 Nov 2026 (Week 3 task 5: Story viewer). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/ and m6_story_viewer_2026-11-05/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
@@ -71,8 +71,10 @@ Last update: 5 Nov 2026 (Week 3 task 4: Path map). Emulator test evidence: notes
 ## M6 (partial) — Basic Reader Mode (Wahab)
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
-| Path map (design p15; FR-MODE-01, D1, D6) | Child's story path | In progress | Approved stories as circles: finished / current / locked, linear unlocking from a new reading_sessions table (DB version 3, decision 024). Unit + widget tested. **Emulator 5 Nov:** DB 2 → 3 kept 9 stories; 1 then 3 circles after approving; hand-inserted test session → story 1 green, story 2 "Tap to play!"; locked tap → "Finish the glowing story first!"; night mode checked. Tap opens the story viewer in the next task. Waiting for quiz |
-| FR-MODE-01 | Mode by age group | Not started | Simple viewer for 2–4, decision 006 |
+| Path map (design p15; FR-MODE-01, D1, D6) | Child's story path | In progress | Approved stories as circles: finished / current / locked, linear unlocking from a new reading_sessions table (DB version 3, decision 024). Unit + widget tested. **Emulator 5 Nov:** DB 2 → 3 kept 9 stories; 1 then 3 circles after approving; hand-inserted test session → story 1 green, story 2 "Tap to play!"; locked tap → "Finish the glowing story first!"; night mode checked. Tap now opens the story viewer. Waiting for quiz |
+| Story viewer (design p13; decisions 006, 025) | Page-by-page story for the child | In progress | Picture + Andika sentence, page dots, Previous/Next, "The end" → path; only approved READY stories (FR-STORY-07). Both age groups for now. Unit + widget tested. **Emulator 5 Nov:** Sara's FLUX story 6 pages, Previous hidden on page 1, "The end" → path; story without pictures shows scenery; night mode checked. Waiting for quiz |
+| FR-TTS-01/02/03 | Read aloud with the phone's voice | In progress | flutter_tts 4.2.5, TextToSpeechService + DeviceTtsNarrator (decision 025). **Emulator 5 Nov:** Google TTS embedded en-US voice (offline) spoke the sentence; turning the page and "The end" stopped it (logcat "Interrupted: true"). "No voice" message widget-tested only. Clip caching and karaoke not built. Waiting for quiz |
+| FR-MODE-01 | Mode by age group | Not started | Both groups use the viewer until Reader Mode (Week 4); then ListenerPolicy / ReaderPolicy (decisions 006, 025) |
 | FR-MODE-04 | Tap-and-read before advancing | Not started | Whole sentence, decision 004 |
 | FR-MODE-05 | Live colour feedback | Not started | |
 | FR-MODE-06 | Stars on completion (simple) | Not started | Decision 009 |
