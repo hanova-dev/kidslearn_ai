@@ -150,6 +150,21 @@ class SqliteStoryRepository implements StoryRepository {
     return stories;
   }
 
+  @override
+  Future<List<Story>> getApprovedStoriesForChild(String childId) async {
+    final rows = await _db.query(
+      'stories',
+      where: 'child_id = ? AND approved = 1 AND status = ?',
+      whereArgs: [childId, StoryStatus.ready.dbValue],
+      orderBy: 'created_at ASC',
+    );
+    final stories = <Story>[];
+    for (final row in rows) {
+      stories.add(Story.fromMap(row));
+    }
+    return stories;
+  }
+
   // ── Mark stories stopped by an app close as FAILED ──
   @override
   Future<int> failInterruptedStories() async {

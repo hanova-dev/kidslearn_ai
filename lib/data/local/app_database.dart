@@ -5,8 +5,8 @@ import 'package:sqflite/sqflite.dart';
 class AppDatabase {
   static const String fileName = 'kidslearn.db';
 
-  /// 1 = child_profiles; 2 = + stories and scenes.
-  static const int version = 2;
+  /// 1 = child_profiles; 2 = + stories and scenes; 3 = + reading_sessions.
+  static const int version = 3;
 
   /// Opens (or creates) kidslearn.db in the app's private documents folder.
   static Future<Database> open() async {
@@ -23,6 +23,7 @@ class AppDatabase {
   static Future<void> createTables(Database db, int version) async {
     await createChildProfilesTable(db);
     await createStoryTables(db);
+    await createReadingSessionsTable(db);
   }
 
   /// Runs on a phone that has an older database file; keeps existing rows.
@@ -33,6 +34,9 @@ class AppDatabase {
   ) async {
     if (oldVersion < 2) {
       await createStoryTables(db);
+    }
+    if (oldVersion < 3) {
+      await createReadingSessionsTable(db);
     }
   }
 
@@ -81,6 +85,24 @@ class AppDatabase {
         image_prompt TEXT NOT NULL,
         image_path TEXT,
         image_source TEXT
+      )
+    ''');
+  }
+
+  // ── Version 3: reading_sessions (decision 024) ──
+  static Future<void> createReadingSessionsTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE reading_sessions (
+        session_id TEXT PRIMARY KEY,
+        child_id TEXT NOT NULL,
+        story_id TEXT NOT NULL,
+        mode TEXT NOT NULL,
+        words_read INTEGER NOT NULL DEFAULT 0,
+        stars_earned INTEGER NOT NULL DEFAULT 0,
+        local_version INTEGER NOT NULL DEFAULT 1,
+        device_id TEXT NOT NULL DEFAULT '',
+        sync_state TEXT NOT NULL DEFAULT 'PENDING',
+        last_modified INTEGER NOT NULL
       )
     ''');
   }

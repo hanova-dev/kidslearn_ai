@@ -32,6 +32,9 @@ abstract class StoryRepository {
   /// Every story of one parent, newest first (Story library, design p9).
   Future<List<Story>> getStoriesForParent(String parentId);
 
+  /// The approved, READY stories of one child, oldest first (path map, FR-STORY-07).
+  Future<List<Story>> getApprovedStoriesForChild(String childId);
+
   /// Marks stories left in DRAFT or GENERATING by an app close as FAILED; returns how many (decision 023).
   Future<int> failInterruptedStories();
 }

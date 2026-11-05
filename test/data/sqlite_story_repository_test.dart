@@ -41,7 +41,7 @@ void main() {
   late Database db;
   late SqliteStoryRepository repository;
 
-  // ── Fresh in-memory database (version 2) for every test ──
+  // ── Fresh in-memory database (newest version) for every test ──
   setUpAll(sqfliteFfiInit);
   setUp(() async {
     db = await databaseFactoryFfi.openDatabase(
@@ -205,6 +205,38 @@ void main() {
         StoryStatus.failed,
       );
       expect((await repository.getStory('ready'))!.status, StoryStatus.ready);
+    },
+  );
+
+  // ── Path map (decision 024) ──
+  test(
+    'getApprovedStoriesForChild gives approved READY stories, oldest first',
+    () async {
+      Future<void> addReady(String id, int day, {bool approve = true}) async {
+        await repository.saveDraft(
+          Story.fromMap({
+            ...makeDraft(id).toMap(),
+            'created_at': DateTime(2026, 11, day).millisecondsSinceEpoch,
+          }),
+        );
+        await repository.updateStatus(id, StoryStatus.generating);
+        await repository.updateStatus(id, StoryStatus.ready);
+        if (approve) {
+          await repository.setApproved(id, true);
+        }
+      }
+
+      await addReady('newer', 5);
+      await addReady('older', 2);
+      await addReady('not-approved', 3, approve: false);
+      await repository.saveDraft(makeDraft('draft'));
+      await repository.saveDraft(
+        Story.fromMap({...makeDraft('other').toMap(), 'child_id': 'child-2'}),
+      );
+
+      final stories = await repository.getApprovedStoriesForChild('child-1');
+
+      expect(stories.map((story) => story.id).toList(), ['older', 'newer']);
     },
   );
 }

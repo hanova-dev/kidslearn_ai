@@ -1,7 +1,7 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 4 Nov 2026 (Week 3 task 3: Story library). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/ and m2_story_library_2026-11-04/.
+Last update: 5 Nov 2026 (Week 3 task 4: Path map). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/ and m6_path_map_2026-11-05/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
@@ -17,7 +17,7 @@ Last update: 4 Nov 2026 (Week 3 task 3: Story library). Emulator test evidence: 
 | FR-AUTH-02 | Child profile: name, buddy, age group, language | In progress | Widget tests pass. **Emulator 28 Oct:** empty-form messages shown; child saved (1 SQLite row: mango, reader_5_7, en). Bug found (old messages stayed after fixing a field) → fixed + test, re-checked on emulator. Waiting for quiz |
 | FR-AUTH-03 | Parent screens only for signed-in parents | In progress | go_router redirect to /login. **Emulator 28 Oct:** signed-out start and log out both land on login. Waiting for quiz |
 | FR-AUTH-04 | Parental gate (router guard) | In progress | Router guard + maths gate (decisions 003, 016). **Emulator 28 Oct:** wrong answer → new sum; right answer → parent home. Waiting for quiz |
-| FR-AUTH-05 | Profile picker (who's reading?) | In progress | **Emulator 28 Oct:** child card shown; tap → "Hi, Ali!"; Home returns. Path map is a placeholder until Week 3. Waiting for quiz |
+| FR-AUTH-05 | Profile picker (who's reading?) | In progress | **Emulator 28 Oct:** child card shown; tap → "Hi, Ali!"; Home returns. **5 Nov:** tapping Ali or Sara now opens their real path map with their own buddy. Waiting for quiz |
 | FR-AUTH-06 | Session kept locally (offline) | In progress | **Emulator 28 Oct:** force-close while unlocked → reopens on Who's reading, locked, still signed in, child kept (decision 016). Waiting for quiz |
 | FR-HCI-01 | AgeExperiencePolicy (Listener/Reader) | Not started | |
 | FR-HCI-04 | Fixed back/home/help positions (ChildScaffold) | Not started | |
@@ -32,7 +32,7 @@ Last update: 4 Nov 2026 (Week 3 task 3: Story library). Emulator test evidence: 
 | FR-STORY-04 | DRAFT / GENERATING / READY / FAILED + retry | In progress | Story generating screen (p8) + Try again. **Emulator 2 Nov:** writing screen seen; offline → "No internet…" + row FAILED; online + Try again → same story READY, 6 scenes. READY now only after all pictures (decision 020). **Story library (design p9, decision 023), emulator 4 Nov:** badges Writing…/Drawing…/Needs check/Approved/Stopped; a force-stopped story turned from GENERATING to FAILED at the next start and showed "Stopped". Waiting for quiz |
 | FR-STORY-05 | Reject too-short prompts | In progress | StoryInputCheck, 15–300 letters in AppConfig, 6 tests. **Emulator 2 Nov:** empty → "Tell us what the story should teach…"; "Sara hits" → "Please write a little more…"; nothing sent. Waiting for quiz |
 | FR-STORY-06 | Regenerate from same prompt | In progress | "Make a new version" on the preview replaces text + pictures of the same story, keeps the prompt, clears approval (decision 022). Unit + widget tested. **Emulator 3 Nov:** "Sky's Gentle Bedtime" got 6 new sentences and 6 new FLUX files, same id, no extra story. **4 Nov:** a Stopped story from the library got a new version ("Mango Tries a New Bite", 6 FLUX). Waiting for quiz |
-| FR-STORY-07 | Parent preview and approve | In progress | Story preview screen: scene list, Approve, Make a new version, Delete with confirm (decisions 011, 022). Unit + widget tested. **Emulator 3 Nov:** Approve → approved = 1 and "Approved. Sara can read it."; Delete → 0 rows, 0 files, "Story deleted." **4 Nov:** opened and approved from the Story library (badge Needs check → Approved, approved = 1); night mode checked. Waiting for quiz |
+| FR-STORY-07 | Parent preview and approve | In progress | Story preview screen: scene list, Approve, Make a new version, Delete with confirm (decisions 011, 022). Unit + widget tested. **Emulator 3 Nov:** Approve → approved = 1 and "Approved. Sara can read it."; Delete → 0 rows, 0 files, "Story deleted." **4 Nov:** opened and approved from the Story library (badge Needs check → Approved, approved = 1); night mode checked. **5 Nov:** only approved stories reach the child: Ali's path had 1 circle, then 3 after approving 2 more (decision 024). Waiting for quiz |
 | FR-STORY-08 | Real name → buddy name in prompts | In progress | StoryPromptBuilder.redactName, 8 tests + controller test (decision 017). **Emulator 2 Nov:** prompt "Sara does not want…" → story about Sky; "Sara" not found in title, character sheet or scenes. Waiting for quiz |
 
 ## M3 — Illustration (Hanan)
@@ -71,6 +71,7 @@ Last update: 4 Nov 2026 (Week 3 task 3: Story library). Emulator test evidence: 
 ## M6 (partial) — Basic Reader Mode (Wahab)
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
+| Path map (design p15; FR-MODE-01, D1, D6) | Child's story path | In progress | Approved stories as circles: finished / current / locked, linear unlocking from a new reading_sessions table (DB version 3, decision 024). Unit + widget tested. **Emulator 5 Nov:** DB 2 → 3 kept 9 stories; 1 then 3 circles after approving; hand-inserted test session → story 1 green, story 2 "Tap to play!"; locked tap → "Finish the glowing story first!"; night mode checked. Tap opens the story viewer in the next task. Waiting for quiz |
 | FR-MODE-01 | Mode by age group | Not started | Simple viewer for 2–4, decision 006 |
 | FR-MODE-04 | Tap-and-read before advancing | Not started | Whole sentence, decision 004 |
 | FR-MODE-05 | Live colour feedback | Not started | |

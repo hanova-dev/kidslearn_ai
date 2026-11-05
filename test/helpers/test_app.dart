@@ -9,6 +9,7 @@ import '../fakes/fake_auth_repository.dart';
 import '../fakes/fake_child_repository.dart';
 import '../fakes/fake_illustrator.dart';
 import '../fakes/fake_image_file_store.dart';
+import '../fakes/fake_reading_session_repository.dart';
 import '../fakes/fake_story_generator.dart';
 import '../fakes/fake_story_repository.dart';
 
@@ -24,6 +25,7 @@ Widget buildTestApp({
   required FakeAuthRepository auth,
   FakeChildRepository? children,
   FakeStoryRepository? stories,
+  FakeReadingSessionRepository? sessions,
   FakeStoryGenerator? storyGenerator,
   FakeIllustrator? illustrator,
   bool parentUnlocked = false,
@@ -36,6 +38,9 @@ Widget buildTestApp({
       ),
       storyRepositoryProvider.overrideWithValue(
         stories ?? FakeStoryRepository(),
+      ),
+      readingSessionRepositoryProvider.overrideWithValue(
+        sessions ?? FakeReadingSessionRepository(),
       ),
       storyGenerationServiceProvider.overrideWithValue(
         storyGenerator ?? FakeStoryGenerator(),

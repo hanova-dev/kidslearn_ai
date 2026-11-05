@@ -6,8 +6,10 @@ import '../data/auth_repository.dart';
 import '../data/child_repository.dart';
 import '../data/local/image_file_store.dart';
 import '../data/local/sqlite_child_repository.dart';
+import '../data/local/sqlite_reading_session_repository.dart';
 import '../data/local/sqlite_story_repository.dart';
 import '../data/remote/firebase_auth_repository.dart';
+import '../data/reading_session_repository.dart';
 import '../data/story_repository.dart';
 import '../services/flux_illustrator.dart';
 import '../services/groq_story_generator.dart';
@@ -39,6 +41,13 @@ final childRepositoryProvider = Provider<ChildRepository>((ref) {
 /// Where stories and scenes are stored (SQLite on the phone).
 final storyRepositoryProvider = Provider<StoryRepository>((ref) {
   return SqliteStoryRepository(ref.watch(databaseProvider));
+});
+
+/// Where finished readings are stored (SQLite on the phone, decision 024).
+final readingSessionRepositoryProvider = Provider<ReadingSessionRepository>((
+  ref,
+) {
+  return SqliteReadingSessionRepository(ref.watch(databaseProvider));
 });
 
 /// Who writes the stories (Groq gpt-oss-120b today).

@@ -109,6 +109,20 @@ class FakeStoryRepository implements StoryRepository {
   }
 
   @override
+  Future<List<Story>> getApprovedStoriesForChild(String childId) async {
+    final list = <Story>[];
+    for (final story in stories.values) {
+      if (story.childId == childId &&
+          story.approved &&
+          story.status == StoryStatus.ready) {
+        list.add(story);
+      }
+    }
+    list.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    return list;
+  }
+
+  @override
   Future<int> failInterruptedStories() async {
     var count = 0;
     for (final story in stories.values.toList()) {

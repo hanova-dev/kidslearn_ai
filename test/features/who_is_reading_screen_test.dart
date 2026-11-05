@@ -45,9 +45,7 @@ void main() {
   });
 
   // ── Picking a child makes them active (FR-AUTH-05) ──
-  testWidgets('tapping a child opens their path with their name', (
-    tester,
-  ) async {
+  testWidgets('tapping a child opens their path', (tester) async {
     final children = FakeChildRepository()
       ..saved.add(makeChild('Fatima', AgeGroup.reader, 'mango'));
 
@@ -63,7 +61,7 @@ void main() {
     await tester.tap(find.text('Fatima'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Hi, Fatima!'), findsOneWidget);
+    expect(find.text('No stories yet.'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Home'));
     await tester.pumpAndSettle();
