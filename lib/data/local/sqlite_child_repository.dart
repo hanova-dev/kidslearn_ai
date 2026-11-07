@@ -30,4 +30,17 @@ class SqliteChildRepository implements ChildRepository {
   Future<void> addChild(ChildProfile child) async {
     await _db.insert('child_profiles', child.toMap());
   }
+
+  // ── Add stars ──
+  @override
+  Future<void> addStars(String childId, int stars) async {
+    if (stars <= 0) {
+      return;
+    }
+    await _db.rawUpdate(
+      'UPDATE child_profiles SET star_balance = star_balance + ? '
+      'WHERE child_id = ?',
+      [stars, childId],
+    );
+  }
 }

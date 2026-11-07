@@ -27,4 +27,24 @@ class FakeChildRepository implements ChildRepository {
     }
     saved.add(child);
   }
+
+  @override
+  Future<void> addStars(String childId, int stars) async {
+    for (var i = 0; i < saved.length; i++) {
+      final old = saved[i];
+      if (old.id == childId) {
+        saved[i] = ChildProfile(
+          id: old.id,
+          parentId: old.parentId,
+          name: old.name,
+          buddyId: old.buddyId,
+          ageGroup: old.ageGroup,
+          language: old.language,
+          starBalance: old.starBalance + stars,
+          readingLevel: old.readingLevel,
+          createdAt: old.createdAt,
+        );
+      }
+    }
+  }
 }

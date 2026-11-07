@@ -1,7 +1,7 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 5 Nov 2026 (Week 3 task 5: Story viewer). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/ and m6_story_viewer_2026-11-05/.
+Last update: 6 Nov 2026 (Week 3 task 6: Story complete). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/ and m6_story_complete_2026-11-06/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
@@ -77,7 +77,7 @@ Last update: 5 Nov 2026 (Week 3 task 5: Story viewer). Emulator test evidence: n
 | FR-MODE-01 | Mode by age group | Not started | Both groups use the viewer until Reader Mode (Week 4); then ListenerPolicy / ReaderPolicy (decisions 006, 025) |
 | FR-MODE-04 | Tap-and-read before advancing | Not started | Whole sentence, decision 004 |
 | FR-MODE-05 | Live colour feedback | Not started | |
-| FR-MODE-06 | Stars on completion (simple) | Not started | Decision 009 |
+| FR-MODE-06 | Stars on completion (simple) | In progress | Story complete (design p22, decision 026): "The end" saves a reading_sessions row and 1 star per page to star_balance; spoken "You did it, <name>!"; Next adventure / Read it again. Unit + widget tested. **Emulator 6 Nov:** Sara +6 (48 words, LISTENER); Ali story 2 → +6 and story 3 unlocked by itself; Read it again +6 → 12; stars kept after restart; night mode checked. Reader Mode will use the 3/2/1 rule (decision 009) in Week 4. Waiting for quiz |
 
 ## Cross-cutting
 | ID | Requirement (short) | Status | Notes |

@@ -9,11 +9,14 @@ import '../../../core/constants/app_fonts.dart';
 import '../../../core/widgets/child_home_button.dart';
 import '../../../core/widgets/round_icon_button.dart';
 import '../../../services/text_to_speech_service.dart';
+import '../../children/controllers/active_child.dart';
+import '../controllers/story_finisher.dart';
 import '../controllers/story_viewer_provider.dart';
 import 'scene_picture.dart';
 import 'viewer_controls.dart';
+import 'viewer_message.dart';
 
-/// Shows one approved story page by page: picture, sentence, read aloud (design p13, decisions 006, 025).
+/// Shows one approved story page by page: picture, sentence, read aloud (design p13, decisions 006, 025, 026).
 class StoryViewerScreen extends ConsumerStatefulWidget {
   const StoryViewerScreen({super.key, required this.storyId});
 
@@ -25,6 +28,7 @@ class StoryViewerScreen extends ConsumerStatefulWidget {
 
 class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
   int _page = 0;
+  bool _finishing = false;
   late final TextToSpeechService _voice;
 
   @override
@@ -45,31 +49,55 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
       data.scenes[_page].text,
       data.story.language,
     );
-    if (!spoken && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'This phone has no voice for this language. '
-            'A grown-up can add one in Settings, Text-to-speech.',
-          ),
-        ),
+    if (!spoken) {
+      _showMessage(
+        'This phone has no voice for this language. '
+        'A grown-up can add one in Settings, Text-to-speech.',
       );
     }
   }
 
-  // ── Turn the page; after the last page go back to the path ──
+  void _showMessage(String text) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+    }
+  }
+
+  // ── Turn the page ──
   void _goTo(int page) {
     _voice.stop();
     setState(() => _page = page);
   }
 
-  void _next(StoryViewerData data) {
+  // ── After the last page: save the reading, then celebrate (decision 026) ──
+  Future<void> _next(StoryViewerData data) async {
     if (_page < data.scenes.length - 1) {
       _goTo(_page + 1);
       return;
     }
+    final child = ref.read(activeChildProvider);
+    if (_finishing || child == null) {
+      return;
+    }
+    _finishing = true;
     _voice.stop();
-    context.go(AppRoutes.pathMap);
+    try {
+      final result = await ref
+          .read(storyFinisherProvider)
+          .finish(
+            child: child,
+            storyId: data.story.id,
+            scenes: data.scenes,
+            now: DateTime.now(),
+          );
+      ref.read(activeChildProvider.notifier).addStars(result.stars);
+      if (mounted) {
+        context.go(AppRoutes.storyCompleteOf(data.story.id, result));
+      }
+    } catch (error) {
+      _finishing = false;
+      _showMessage('Could not save your stars. Please try again.');
+    }
   }
 
   @override
@@ -82,13 +110,13 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
       body: SafeArea(
         child: viewer.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => _ViewerMessage(
+          error: (error, stack) => ViewerMessage(
             text: 'Could not open this story.',
             onRetry: () => ref.invalidate(storyViewerProvider(widget.storyId)),
           ),
           data: (data) {
             if (data == null) {
-              return const _ViewerMessage(text: 'This story is not ready yet.');
+              return const ViewerMessage(text: 'This story is not ready yet.');
             }
             return _buildPage(data);
           },
@@ -165,34 +193,6 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
             onNext: () => _next(data),
           ),
           const SizedBox(height: 96),
-        ],
-      ),
-    );
-  }
-}
-
-/// A short message with an optional Try again button.
-class _ViewerMessage extends StatelessWidget {
-  const _ViewerMessage({required this.text, this.onRetry});
-
-  final String text;
-  final VoidCallback? onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(text, style: Theme.of(context).textTheme.headlineSmall),
-          const SizedBox(height: 16),
-          if (onRetry != null)
-            FilledButton(onPressed: onRetry, child: const Text('Try again')),
-          if (onRetry == null)
-            FilledButton(
-              onPressed: () => context.go(AppRoutes.pathMap),
-              child: const Text('Back to my stories'),
-            ),
         ],
       ),
     );

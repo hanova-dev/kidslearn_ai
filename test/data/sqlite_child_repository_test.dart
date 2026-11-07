@@ -63,4 +63,17 @@ void main() {
   test('a parent with no children gets an empty list', () async {
     expect(await repository.getChildren('parent-9'), isEmpty);
   });
+
+  // ── Stars only go up (FR-HCI-06) ──
+  test('addStars adds to the balance; zero or less changes nothing', () async {
+    await repository.addChild(makeChild('c1', 'parent-1', 'Zayan', 0));
+
+    await repository.addStars('c1', 6);
+    await repository.addStars('c1', 3);
+    await repository.addStars('c1', -5);
+    await repository.addStars('c1', 0);
+
+    final children = await repository.getChildren('parent-1');
+    expect(children.first.starBalance, 9);
+  });
 }

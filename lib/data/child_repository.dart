@@ -7,4 +7,7 @@ abstract class ChildRepository {
 
   /// Saves a new child profile.
   Future<void> addChild(ChildProfile child);
+
+  /// Adds [stars] to the child's star balance; stars are never taken away (FR-HCI-06).
+  Future<void> addStars(String childId, int stars);
 }

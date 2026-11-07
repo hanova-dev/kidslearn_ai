@@ -100,7 +100,7 @@ void main() {
     expect(find.text('Sentence 1.'), findsOneWidget);
   });
 
-  testWidgets('"The end" on the last page goes back to the path', (
+  testWidgets('"The end" on the last page opens Story complete', (
     tester,
   ) async {
     await openViewer(tester);
@@ -113,7 +113,7 @@ void main() {
 
     await tester.tap(find.byTooltip('The end'));
     await tester.pumpAndSettle();
-    expect(find.text('Tap to play!'), findsOneWidget);
+    expect(find.text('You did it, Zayan!'), findsOneWidget);
   });
 
   // ── Read aloud (FR-TTS-01, FR-TTS-02) ──

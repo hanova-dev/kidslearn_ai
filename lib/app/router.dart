@@ -8,7 +8,9 @@ import '../features/auth/screens/splash_screen.dart';
 import '../features/children/screens/add_child_screen.dart';
 import '../features/children/screens/parent_home_screen.dart';
 import '../features/children/screens/who_is_reading_screen.dart';
+import '../features/reading/controllers/story_finisher.dart';
 import '../features/reading/screens/path_map_screen.dart';
+import '../features/reading/screens/story_complete_screen.dart';
 import '../features/reading/screens/story_viewer_screen.dart';
 import '../features/stories/screens/create_story_screen.dart';
 import '../features/stories/screens/story_generating_screen.dart';
@@ -30,6 +32,7 @@ class AppRoutes {
   static const String storyPreview = '/story-preview';
   static const String storyLibrary = '/library';
   static const String storyViewer = '/story';
+  static const String storyComplete = '/story-complete';
 
   /// The preview path for one story, e.g. `/story-preview?id=story-1`.
   static String storyPreviewOf(String storyId) {
@@ -39,6 +42,12 @@ class AppRoutes {
   /// The child's viewer path for one story, e.g. `/story?id=story-1`.
   static String storyViewerOf(String storyId) {
     return '$storyViewer?id=$storyId';
+  }
+
+  /// Story complete for one finished reading, e.g. `/story-complete?id=s1&words=18&stars=6`.
+  static String storyCompleteOf(String storyId, StoryResult result) {
+    return '$storyComplete?id=$storyId'
+        '&words=${result.wordsRead}&stars=${result.stars}';
   }
 
   /// Screens only an unlocked parent may open (SRS D7).
@@ -136,6 +145,17 @@ GoRouter buildRouter(Ref ref) {
         path: AppRoutes.storyViewer,
         builder: (context, state) =>
             StoryViewerScreen(storyId: state.uri.queryParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: AppRoutes.storyComplete,
+        builder: (context, state) {
+          final query = state.uri.queryParameters;
+          return StoryCompleteScreen(
+            storyId: query['id'] ?? '',
+            wordsRead: int.tryParse(query['words'] ?? '') ?? 0,
+            stars: int.tryParse(query['stars'] ?? '') ?? 0,
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.storyLibrary,
