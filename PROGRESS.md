@@ -1,7 +1,7 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 6 Nov 2026 (Week 3 task 6: Story complete). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/ and m6_story_complete_2026-11-06/.
+Last update: 9 Nov 2026 (Week 4 task 1: PhoneticScorer). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/ and m6_story_complete_2026-11-06/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
@@ -59,14 +59,14 @@ Last update: 6 Nov 2026 (Week 3 task 6: Story complete). Emulator test evidence:
 ## M5 — PhoneticScorer (Hanan)
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
-| FR-SCORE-01 | Double Metaphone codes | Not started | Package vs own subset: team must choose |
-| FR-SCORE-02 | Levenshtein distance | Not started | Tests first |
-| FR-SCORE-03 | Normalised similarity | Not started | |
-| FR-SCORE-04 | CORRECT / NEAR_MISS / TRY_AGAIN | Not started | |
-| FR-SCORE-05 | Per-language thresholds | Not started | |
+| FR-SCORE-01 | Double Metaphone codes | In progress | Unit-tested (42 algorithm tests pass). Own documented subset, decision 027; `double_metaphone_test.dart`. Phone check with Reader Mode; waiting for quiz |
+| FR-SCORE-02 | Levenshtein distance | In progress | Unit-tested (42 algorithm tests pass). Tests written first; `levenshtein_test.dart`. Phone check with Reader Mode; waiting for quiz |
+| FR-SCORE-03 | Normalised similarity | In progress | Unit-tested (42 algorithm tests pass). 1 - distance / longer code; `phonetic_scorer_test.dart`. Phone check with Reader Mode; waiting for quiz |
+| FR-SCORE-04 | CORRECT / NEAR_MISS / TRY_AGAIN | In progress | Unit-tested (42 algorithm tests pass). `Verdict` enum with SQLite text. Phone check with Reader Mode; waiting for quiz |
+| FR-SCORE-05 | Per-language thresholds | In progress | Unit-tested (42 algorithm tests pass). en 0.80/0.55, ur 0.72/0.47; tunable (decision 027). Phone check with Reader Mode; waiting for quiz |
 | FR-SCORE-06 | Practice-word list | Not started | |
-| FR-SCORE-07 | Colours within 300 ms | Not started | Benchmark on the phone |
-| FR-SCORE-08 | Word alignment (SRS 8.1.6) | Not started | Tests first |
+| FR-SCORE-07 | Colours within 300 ms | In progress | Scorer 0.75 ms per sentence on the laptop; colours come with Reader Mode; phone not measured |
+| FR-SCORE-08 | Word alignment (SRS 8.1.6) | In progress | Unit-tested (42 algorithm tests pass). Skipped, extra, repeated and changed words; `word_aligner_test.dart`. Phone check with Reader Mode; waiting for quiz |
 
 ## M6 (partial) — Basic Reader Mode (Wahab)
 | FR | Requirement (short) | Status | Notes |
@@ -86,4 +86,4 @@ Last update: 6 Nov 2026 (Week 3 task 6: Story complete). Emulator test evidence:
 | NFR-USE-03 | Plain-language errors with retry | In progress | Login errors mapped to plain sentences (AuthFailure) |
 | NFR-REL-02 | 15 s timeout, 2 retries | In progress | Done for Groq story calls; FLUX and Whisper later |
 | NFR-REL-05 | Fallback adapter for every AI service | Not started | |
-| NFR-PERF-01 | Verdict ≤ 300 ms | Not started | |
+| NFR-PERF-01 | Verdict ≤ 300 ms | In progress | `phonetic_scorer_speed_test.dart` + `tool/scorer_speed_check.dart` (0.75 ms on the laptop); phone not measured |
