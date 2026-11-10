@@ -1,7 +1,7 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 9 Nov 2026 (Week 4 task 1: PhoneticScorer). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/ and m6_story_complete_2026-11-06/.
+Last update: 10 Nov 2026 (Week 4 task 2: speech-to-text services). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/ and m6_story_complete_2026-11-06/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
@@ -48,13 +48,13 @@ Last update: 9 Nov 2026 (Week 4 task 1: PhoneticScorer). Emulator test evidence:
 ## M4 — Speech-to-text (Hanan)
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
-| FR-STT-01 | Mic only while the child triggers it | Not started | |
-| FR-STT-02 | SpeechToTextService → GroqWhisperTranscriber | In progress | Spike works (0.7 s) |
-| FR-STT-03 | Language from child profile | Not started | English only, decision 005 |
-| FR-STT-04 | Delete audio after transcription | Not started | |
-| FR-STT-05 | Retry when no speech detected | Not started | |
-| FR-STT-06 | One sentence per request | Not started | Decision 004 |
-| FR-STT-07 | DeviceSpeechRecognizer fallback | Not started | Needs the physical phone |
+| FR-STT-01 | Mic only while the child triggers it | In progress | `startListening` / `stopListening` (decision 028); the mic button comes with Reader Mode. Unit-tested; device check with Reader Mode. |
+| FR-STT-02 | SpeechToTextService → GroqWhisperTranscriber | In progress | Multipart request, mocked tests; real call through the app class 10 Nov: word-perfect, 2.1 s (`tool/whisper_transcriber_check.dart`). Unit-tested; device check with Reader Mode. |
+| FR-STT-03 | Language from child profile | In progress | Language code passed to Whisper; en_US / ur_PK for the phone recogniser; English only (decision 005). Unit-tested; device check with Reader Mode. |
+| FR-STT-04 | Delete audio after transcription | In progress | WAV deleted in `finally` after success and failure; tested, and the real check confirmed the file was gone. Unit-tested; device check with Reader Mode. |
+| FR-STT-05 | Retry when no speech detected | In progress | Empty transcript → "We didn't hear anything…" (no switch); the retry button comes with Reader Mode |
+| FR-STT-06 | One sentence per request | In progress | One request per stop, no retries (decisions 004, 028). Unit-tested; device check with Reader Mode. |
+| FR-STT-07 | DeviceSpeechRecognizer fallback | In progress | `SpeechToTextWithFallback`: after a Whisper failure, "Let's read that sentence once more", then the phone recogniser (decision 028). Unit-tested with fakes; needs a device test (offline English pack) |
 
 ## M5 — PhoneticScorer (Hanan)
 | FR | Requirement (short) | Status | Notes |
@@ -85,5 +85,5 @@ Last update: 9 Nov 2026 (Week 4 task 1: PhoneticScorer). Emulator test evidence:
 | NFR-SEC-03 | Keys never in source control | In progress | env/ in .gitignore; check before first commit |
 | NFR-USE-03 | Plain-language errors with retry | In progress | Login errors mapped to plain sentences (AuthFailure) |
 | NFR-REL-02 | 15 s timeout, 2 retries | In progress | Done for Groq story calls; FLUX and Whisper later |
-| NFR-REL-05 | Fallback adapter for every AI service | Not started | |
+| NFR-REL-05 | Fallback adapter for every AI service | In progress | Pictures: placeholder (FR-ILLUS-06). Speech: phone recogniser (decision 028, unit-tested) |
 | NFR-PERF-01 | Verdict ≤ 300 ms | In progress | `phonetic_scorer_speed_test.dart` + `tool/scorer_speed_check.dart` (0.75 ms on the laptop); phone not measured |

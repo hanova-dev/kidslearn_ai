@@ -11,11 +11,16 @@ import '../data/local/sqlite_story_repository.dart';
 import '../data/remote/firebase_auth_repository.dart';
 import '../data/reading_session_repository.dart';
 import '../data/story_repository.dart';
+import '../services/device_speech_recognizer.dart';
 import '../services/device_tts_narrator.dart';
+import '../services/device_voice_recorder.dart';
 import '../services/flux_illustrator.dart';
 import '../services/groq_story_generator.dart';
+import '../services/groq_whisper_transcriber.dart';
 import '../services/illustration_service.dart';
 import '../services/placeholder_illustrator.dart';
+import '../services/speech_to_text_service.dart';
+import '../services/speech_to_text_with_fallback.dart';
 import '../services/story_generation_service.dart';
 import '../services/text_to_speech_service.dart';
 import 'app_config.dart';
@@ -78,6 +83,18 @@ final fallbackIllustrationServiceProvider = Provider<IllustrationService>((
 /// Who reads the story aloud (the phone's own voice, FR-TTS-01).
 final textToSpeechServiceProvider = Provider<TextToSpeechService>((ref) {
   return DeviceTtsNarrator();
+});
+
+/// Who listens to the child reading: Whisper first, the phone's recogniser when Whisper is down (FR-STT-07).
+final speechToTextServiceProvider = Provider<SpeechToTextService>((ref) {
+  return SpeechToTextWithFallback(
+    primary: GroqWhisperTranscriber(
+      recorder: DeviceVoiceRecorder(),
+      apiKey: AppConfig.groqApiKey,
+      modelId: AppConfig.speechModelId,
+    ),
+    fallback: DeviceSpeechRecognizer(),
+  );
 });
 
 /// Where scene pictures are saved as files (FR-ILLUS-02).
