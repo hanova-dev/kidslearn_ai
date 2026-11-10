@@ -10,6 +10,7 @@ import '../../../core/constants/buddies.dart';
 import '../../../core/widgets/buddy_face.dart';
 import '../../../services/text_to_speech_service.dart';
 import '../../children/controllers/active_child.dart';
+import '../../children/controllers/active_policy.dart';
 import 'celebration_painter.dart';
 
 /// "You did it!" after the last page: words read, stars earned, what next (design p22, FR-MODE-06, D6).
@@ -131,8 +132,12 @@ class _StoryCompleteScreenState extends ConsumerState<StoryCompleteScreen> {
                     foregroundColor: colors.ink,
                     side: BorderSide(color: colors.border, width: 2),
                   ),
-                  onPressed: () =>
-                      context.go(AppRoutes.storyViewerOf(widget.storyId)),
+                  onPressed: () => context.go(
+                    AppRoutes.openStoryOf(
+                      ref.read(activePolicyProvider),
+                      widget.storyId,
+                    ),
+                  ),
                   child: const Text('Read it again'),
                 ),
               ),

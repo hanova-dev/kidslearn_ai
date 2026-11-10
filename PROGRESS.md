@@ -1,7 +1,7 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 10 Nov 2026 (Week 4 task 2: speech-to-text services). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/ and m6_story_complete_2026-11-06/.
+Last update: 11 Nov 2026 (Week 4 task 3: basic Reader Mode). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/, m6_story_complete_2026-11-06/ and m6_reader_mode_2026-11-11/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
@@ -19,9 +19,9 @@ Last update: 10 Nov 2026 (Week 4 task 2: speech-to-text services). Emulator test
 | FR-AUTH-04 | Parental gate (router guard) | In progress | Router guard + maths gate (decisions 003, 016). **Emulator 28 Oct:** wrong answer → new sum; right answer → parent home. Waiting for quiz |
 | FR-AUTH-05 | Profile picker (who's reading?) | In progress | **Emulator 28 Oct:** child card shown; tap → "Hi, Ali!"; Home returns. **5 Nov:** tapping Ali or Sara now opens their real path map with their own buddy. Waiting for quiz |
 | FR-AUTH-06 | Session kept locally (offline) | In progress | **Emulator 28 Oct:** force-close while unlocked → reopens on Who's reading, locked, still signed in, child kept (decision 016). Waiting for quiz |
-| FR-HCI-01 | AgeExperiencePolicy (Listener/Reader) | Not started | |
+| FR-HCI-01 | AgeExperiencePolicy (Listener/Reader) | In progress | `lib/policy/age_experience_policy.dart`: ListenerPolicy / ReaderPolicy (mode, mic, touch target, text size), `activePolicyProvider`; used by the path map, Story complete and StoryFinisher (decision 029). Unit + widget tested. Emulator 11 Nov: Ali (5–7) opens Reader Mode, Sara (2–4) the viewer. Gestures and the full route graph per policy are not built. |
 | FR-HCI-04 | Fixed back/home/help positions (ChildScaffold) | Not started | |
-| FR-HCI-05 | No solid red; colour + icon + sound | Not started | Decision 008 |
+| FR-HCI-05 | No solid red; colour + icon + sound | In progress | Reader Mode: green / amber / soft coral + underline style + banner icon + the phone's voice (decisions 008, 029; no sound files). Widget tested; emulator 11 Nov: day and night checked, voice spoke the feedback. |
 
 ## M2 — Story generation (Hanan)
 | FR | Requirement (short) | Status | Notes |
@@ -48,13 +48,13 @@ Last update: 10 Nov 2026 (Week 4 task 2: speech-to-text services). Emulator test
 ## M4 — Speech-to-text (Hanan)
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
-| FR-STT-01 | Mic only while the child triggers it | In progress | `startListening` / `stopListening` (decision 028); the mic button comes with Reader Mode. Unit-tested; device check with Reader Mode. |
-| FR-STT-02 | SpeechToTextService → GroqWhisperTranscriber | In progress | Multipart request, mocked tests; real call through the app class 10 Nov: word-perfect, 2.1 s (`tool/whisper_transcriber_check.dart`). Unit-tested; device check with Reader Mode. |
+| FR-STT-01 | Mic only while the child triggers it | In progress | `startListening` / `stopListening` (decision 028); the mic button comes with Reader Mode. Unit-tested; device check with Reader Mode. Reader Mode mic button; mic off on Back and after 20 s (widget tested). **Emulator 11 Nov:** permission dialog, then recording into the cache folder. |
+| FR-STT-02 | SpeechToTextService → GroqWhisperTranscriber | In progress | Multipart request, mocked tests; real call through the app class 10 Nov: word-perfect, 2.1 s (`tool/whisper_transcriber_check.dart`). Unit-tested; device check with Reader Mode. **Emulator 11 Nov:** recording → Whisper → coloured words through the app (quiet emulator audio, so accuracy not judged). |
 | FR-STT-03 | Language from child profile | In progress | Language code passed to Whisper; en_US / ur_PK for the phone recogniser; English only (decision 005). Unit-tested; device check with Reader Mode. |
-| FR-STT-04 | Delete audio after transcription | In progress | WAV deleted in `finally` after success and failure; tested, and the real check confirmed the file was gone. Unit-tested; device check with Reader Mode. |
-| FR-STT-05 | Retry when no speech detected | In progress | Empty transcript → "We didn't hear anything…" (no switch); the retry button comes with Reader Mode |
+| FR-STT-04 | Delete audio after transcription | In progress | WAV deleted in `finally` after success and failure; tested, and the real check confirmed the file was gone. Unit-tested; device check with Reader Mode. **Emulator 11 Nov:** 0 WAV files in the cache after each reading. |
+| FR-STT-05 | Retry when no speech detected | In progress | Empty transcript → "We didn't hear anything…" (no switch). Reader Mode shows it in a banner, says it, and shows the mic again (widget tested; emulator 11 Nov seen). |
 | FR-STT-06 | One sentence per request | In progress | One request per stop, no retries (decisions 004, 028). Unit-tested; device check with Reader Mode. |
-| FR-STT-07 | DeviceSpeechRecognizer fallback | In progress | `SpeechToTextWithFallback`: after a Whisper failure, "Let's read that sentence once more", then the phone recogniser (decision 028). Unit-tested with fakes; needs a device test (offline English pack) |
+| FR-STT-07 | DeviceSpeechRecognizer fallback | In progress | `SpeechToTextWithFallback`: after a Whisper failure, "Let's read that sentence once more", then the phone recogniser (decision 028). Unit-tested with fakes; needs a device test (offline English pack) **Emulator 11 Nov:** Wi-Fi/data off → "Let's read that sentence once more" → next reading used the phone recogniser (logcat). It failed offline (no offline English pack on the emulator) and online heard no words from the quiet audio; it also stops after ~1 s of silence. Needs the phone. |
 
 ## M5 — PhoneticScorer (Hanan)
 | FR | Requirement (short) | Status | Notes |
@@ -64,20 +64,21 @@ Last update: 10 Nov 2026 (Week 4 task 2: speech-to-text services). Emulator test
 | FR-SCORE-03 | Normalised similarity | In progress | Unit-tested (42 algorithm tests pass). 1 - distance / longer code; `phonetic_scorer_test.dart`. Phone check with Reader Mode; waiting for quiz |
 | FR-SCORE-04 | CORRECT / NEAR_MISS / TRY_AGAIN | In progress | Unit-tested (42 algorithm tests pass). `Verdict` enum with SQLite text. Phone check with Reader Mode; waiting for quiz |
 | FR-SCORE-05 | Per-language thresholds | In progress | Unit-tested (42 algorithm tests pass). en 0.80/0.55, ur 0.72/0.47; tunable (decision 027). Phone check with Reader Mode; waiting for quiz |
-| FR-SCORE-06 | Practice-word list | Not started | |
-| FR-SCORE-07 | Colours within 300 ms | In progress | Scorer 0.75 ms per sentence on the laptop; colours come with Reader Mode; phone not measured |
+| FR-SCORE-06 | Practice-word list | Not started | Left for later by the team (11 Nov, decision 029); comes with the Word practice screen (design p21) |
+| FR-SCORE-07 | Colours within 300 ms | In progress | Scorer 0.75 ms per sentence on the laptop; colours come with Reader Mode; phone not measured Reader Mode colours, banner and voice (11 Nov, widget tested, emulator day/night); the 300 ms is still not timed on the phone. |
 | FR-SCORE-08 | Word alignment (SRS 8.1.6) | In progress | Unit-tested (42 algorithm tests pass). Skipped, extra, repeated and changed words; `word_aligner_test.dart`. Phone check with Reader Mode; waiting for quiz |
 
 ## M6 (partial) — Basic Reader Mode (Wahab)
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
 | Path map (design p15; FR-MODE-01, D1, D6) | Child's story path | In progress | Approved stories as circles: finished / current / locked, linear unlocking from a new reading_sessions table (DB version 3, decision 024). Unit + widget tested. **Emulator 5 Nov:** DB 2 → 3 kept 9 stories; 1 then 3 circles after approving; hand-inserted test session → story 1 green, story 2 "Tap to play!"; locked tap → "Finish the glowing story first!"; night mode checked. Tap now opens the story viewer. Waiting for quiz |
-| Story viewer (design p13; decisions 006, 025) | Page-by-page story for the child | In progress | Picture + Andika sentence, page dots, Previous/Next, "The end" → path; only approved READY stories (FR-STORY-07). Both age groups for now. Unit + widget tested. **Emulator 5 Nov:** Sara's FLUX story 6 pages, Previous hidden on page 1, "The end" → path; story without pictures shows scenery; night mode checked. Waiting for quiz |
+| Story viewer (design p13; decisions 006, 025) | Page-by-page story for the child | In progress | Picture + Andika sentence, page dots, Previous/Next, "The end" → path; only approved READY stories (FR-STORY-07). 2–4 children only since Reader Mode (11 Nov, decision 029); 5–7 children get Reader Mode. Unit + widget tested. **Emulator 5 Nov:** Sara's FLUX story 6 pages, Previous hidden on page 1, "The end" → path; story without pictures shows scenery; night mode checked. Waiting for quiz |
 | FR-TTS-01/02/03 | Read aloud with the phone's voice | In progress | flutter_tts 4.2.5, TextToSpeechService + DeviceTtsNarrator (decision 025). **Emulator 5 Nov:** Google TTS embedded en-US voice (offline) spoke the sentence; turning the page and "The end" stopped it (logcat "Interrupted: true"). "No voice" message widget-tested only. Clip caching and karaoke not built. Waiting for quiz |
-| FR-MODE-01 | Mode by age group | Not started | Both groups use the viewer until Reader Mode (Week 4); then ListenerPolicy / ReaderPolicy (decisions 006, 025) |
-| FR-MODE-04 | Tap-and-read before advancing | Not started | Whole sentence, decision 004 |
-| FR-MODE-05 | Live colour feedback | Not started | |
-| FR-MODE-06 | Stars on completion (simple) | In progress | Story complete (design p22, decision 026): "The end" saves a reading_sessions row and 1 star per page to star_balance; spoken "You did it, <name>!"; Next adventure / Read it again. Unit + widget tested. **Emulator 6 Nov:** Sara +6 (48 words, LISTENER); Ali story 2 → +6 and story 3 unlocked by itself; Read it again +6 → 12; stars kept after restart; night mode checked. Reader Mode will use the 3/2/1 rule (decision 009) in Week 4. Waiting for quiz |
+| Reader Mode (designs p18–p20; decisions 004, 009, 029) | Read aloud, coloured words | In progress | `ReaderScreen` + `ReaderPage`, `ReadingController`, `SentenceCheck`, `ShownWord`; 20 new tests (207 in total). **Emulator 11 Nov:** see FR-STT and FR-MODE rows; screenshots in notes/images/m6_reader_mode_2026-11-11/. Phone test with a real voice still needed. |
+| FR-MODE-01 | Mode by age group | In progress | `AppRoutes.openStoryOf(policy, id)`: 5–7 → Reader Mode (`/read`), 2–4 → story viewer (decision 029). Parent override not built. Widget tested; emulator 11 Nov checked. |
+| FR-MODE-04 | Tap-and-read before advancing | In progress | Mic → read the whole sentence → stop (decision 004); Next page appears only after a reading. Widget tested; emulator 11 Nov checked. |
+| FR-MODE-05 | Live colour feedback | In progress | After stop, every word gets its verdict colour (`ShownWord`, `ReaderSentence`); the weakest word gives the banner and the spoken feedback (`SentenceCheck`). Widget tested. Emulator 11 Nov: colours shown in day and night; accuracy with a real voice still to be checked on the phone. |
+| FR-MODE-06 | Stars on completion (simple) | In progress | Story complete (design p22, decision 026): "The end" saves a reading_sessions row and 1 star per page to star_balance; spoken "You did it, <name>!"; Next adventure / Read it again. Unit + widget tested. **Emulator 6 Nov:** Sara +6 (48 words, LISTENER); Ali story 2 → +6 and story 3 unlocked by itself; Read it again +6 → 12; stars kept after restart; night mode checked. Reader Mode will use the 3/2/1 rule (decision 009) in Week 4. Waiting for quiz Reader Mode (11 Nov, decision 029): 3/2/1 stars per sentence (decision 009), best try per page; emulator: READER session, 44 words, +6, Ali 18 → 24, story 3 finished. |
 
 ## Cross-cutting
 | ID | Requirement (short) | Status | Notes |

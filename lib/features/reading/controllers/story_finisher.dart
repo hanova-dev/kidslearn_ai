@@ -2,11 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
 import '../../../data/child_repository.dart';
-import '../../../data/models/age_group.dart';
 import '../../../data/models/child_profile.dart';
 import '../../../data/models/reading_session.dart';
 import '../../../data/models/scene.dart';
 import '../../../data/reading_session_repository.dart';
+import '../../../policy/age_experience_policy.dart';
 
 /// What one finished reading earned; shown on the Story complete screen.
 class StoryResult {
@@ -23,7 +23,7 @@ class StoryFinisher {
   final ReadingSessionRepository _sessions;
   final ChildRepository _children;
 
-  /// One star for every page read in the viewer (SRS 10.10).
+  /// One star for every page read in the story viewer (SRS 10.10).
   static const int starsPerPage = 1;
 
   /// Counts the words in every scene, e.g. "Sky hops home." is 3 words.
@@ -39,23 +39,18 @@ class StoryFinisher {
     return count;
   }
 
-  /// Saves the session, adds the stars to the child and returns what was earned.
+  /// Saves the session with the [stars] the child earned, adds them to the child and returns what was earned.
   Future<StoryResult> finish({
     required ChildProfile child,
     required String storyId,
     required List<Scene> scenes,
+    required int stars,
     required DateTime now,
   }) async {
-    final result = StoryResult(
-      wordsRead: countWords(scenes),
-      stars: scenes.length * starsPerPage,
-    );
+    final result = StoryResult(wordsRead: countWords(scenes), stars: stars);
 
     // ── One session row per finished reading ──
-    var mode = 'LISTENER';
-    if (child.ageGroup == AgeGroup.reader) {
-      mode = 'READER';
-    }
+    final mode = AgeExperiencePolicy.of(child.ageGroup).sessionMode;
     await _sessions.saveSession(
       ReadingSession(
         id: 'session-${now.microsecondsSinceEpoch}',

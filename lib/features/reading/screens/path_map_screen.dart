@@ -8,6 +8,7 @@ import '../../../core/widgets/buddy_face.dart';
 import '../../../core/widgets/child_home_button.dart';
 import '../../../core/widgets/scenery_background.dart';
 import '../../children/controllers/active_child.dart';
+import '../../children/controllers/active_policy.dart';
 import '../controllers/path_map_provider.dart';
 import '../controllers/path_node.dart';
 import 'path_map_view.dart';
@@ -18,7 +19,7 @@ class PathMapScreen extends ConsumerWidget {
   const PathMapScreen({super.key});
 
   // ── Open a story, or explain why it is locked ──
-  void _openStory(BuildContext context, PathNode node) {
+  void _openStory(BuildContext context, WidgetRef ref, PathNode node) {
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
     if (!node.canOpen) {
@@ -27,7 +28,8 @@ class PathMapScreen extends ConsumerWidget {
       );
       return;
     }
-    context.go(AppRoutes.storyViewerOf(node.story.id));
+    final policy = ref.read(activePolicyProvider);
+    context.go(AppRoutes.openStoryOf(policy, node.story.id));
   }
 
   @override
@@ -70,7 +72,7 @@ class PathMapScreen extends ConsumerWidget {
                     return PathMapView(
                       nodes: nodes,
                       buddy: buddy,
-                      onTapNode: (node) => _openStory(context, node),
+                      onTapNode: (node) => _openStory(context, ref, node),
                     );
                   },
                 ),

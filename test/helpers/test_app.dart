@@ -10,6 +10,7 @@ import '../fakes/fake_child_repository.dart';
 import '../fakes/fake_illustrator.dart';
 import '../fakes/fake_image_file_store.dart';
 import '../fakes/fake_reading_session_repository.dart';
+import '../fakes/fake_speech_to_text.dart';
 import '../fakes/fake_story_generator.dart';
 import '../fakes/fake_story_repository.dart';
 import '../fakes/fake_text_to_speech.dart';
@@ -21,13 +22,14 @@ void usePhoneScreen(WidgetTester tester) {
   addTearDown(tester.view.reset);
 }
 
-/// The whole app with fake sign-in, storage, story writer and illustrators (no Firebase, disk or network).
+/// The whole app with fake sign-in, storage, story writer, illustrators and speech (no Firebase, disk, network or microphone).
 Widget buildTestApp({
   required FakeAuthRepository auth,
   FakeChildRepository? children,
   FakeStoryRepository? stories,
   FakeReadingSessionRepository? sessions,
   FakeTextToSpeech? voice,
+  FakeSpeechToText? speech,
   FakeStoryGenerator? storyGenerator,
   FakeIllustrator? illustrator,
   bool parentUnlocked = false,
@@ -56,6 +58,9 @@ Widget buildTestApp({
       imageFileStoreProvider.overrideWithValue(FakeImageFileStore()),
       textToSpeechServiceProvider.overrideWithValue(
         voice ?? FakeTextToSpeech(),
+      ),
+      speechToTextServiceProvider.overrideWithValue(
+        speech ?? FakeSpeechToText(source: 'WHISPER'),
       ),
       if (parentUnlocked) parentUnlockProvider.overrideWith(_StartUnlocked.new),
     ],

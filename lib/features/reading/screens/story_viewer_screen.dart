@@ -88,6 +88,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
             child: child,
             storyId: data.story.id,
             scenes: data.scenes,
+            stars: data.scenes.length * StoryFinisher.starsPerPage,
             now: DateTime.now(),
           );
       ref.read(activeChildProvider.notifier).addStars(result.stars);

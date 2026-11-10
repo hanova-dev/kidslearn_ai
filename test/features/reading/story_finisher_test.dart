@@ -46,7 +46,7 @@ void main() {
   });
 
   // ── Saving a finished reading (FR-MODE-06, decision 026) ──
-  test('finish saves one session and adds one star per page', () async {
+  test('finish saves one session and adds the stars it is given', () async {
     final sessions = FakeReadingSessionRepository();
     final children = FakeChildRepository()
       ..saved.add(makeChild(AgeGroup.reader));
@@ -56,6 +56,7 @@ void main() {
       child: makeChild(AgeGroup.reader),
       storyId: 's1',
       scenes: scenes,
+      stars: 2,
       now: DateTime(2026, 11, 6, 10),
     );
 
@@ -79,6 +80,7 @@ void main() {
         child: makeChild(AgeGroup.listener),
         storyId: 's1',
         scenes: scenes,
+        stars: 2,
         now: DateTime(2026, 11, 6, 10, i),
       );
     }

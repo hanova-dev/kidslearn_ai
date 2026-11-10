@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../app/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/widgets/round_icon_button.dart';
+import '../../../core/widgets/star_count_chip.dart';
 
 /// Top of the path map: Back on the left, the child's stars in the middle (design p15).
 class PathTopBar extends StatelessWidget {
@@ -13,7 +13,6 @@ class PathTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = AppColors.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       child: Row(
@@ -27,24 +26,7 @@ class PathTopBar extends StatelessWidget {
           const Spacer(),
 
           // ── Star count ──
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-            decoration: BoxDecoration(
-              color: Color.lerp(colors.surface, colors.sunshine, 0.3),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.star_rounded, color: colors.sunshine, size: 30),
-                const SizedBox(width: 6),
-                Text(
-                  '$stars',
-                  style: Theme.of(context).textTheme.headlineSmall
-                      ?.copyWith(color: colors.ink),
-                ),
-              ],
-            ),
-          ),
+          StarCountChip(stars: stars),
           const Spacer(),
           const SizedBox(width: AppSizes.listenerTouchTarget),
         ],

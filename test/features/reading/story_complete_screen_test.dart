@@ -18,7 +18,7 @@ ChildProfile makeChild() {
     parentId: 'parent-1',
     name: 'Ali',
     buddyId: 'mango',
-    ageGroup: AgeGroup.reader,
+    ageGroup: AgeGroup.listener,
     language: 'en',
     starBalance: 5,
     readingLevel: 1,

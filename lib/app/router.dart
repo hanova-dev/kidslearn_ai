@@ -10,12 +10,14 @@ import '../features/children/screens/parent_home_screen.dart';
 import '../features/children/screens/who_is_reading_screen.dart';
 import '../features/reading/controllers/story_finisher.dart';
 import '../features/reading/screens/path_map_screen.dart';
+import '../features/reading/screens/reader_screen.dart';
 import '../features/reading/screens/story_complete_screen.dart';
 import '../features/reading/screens/story_viewer_screen.dart';
 import '../features/stories/screens/create_story_screen.dart';
 import '../features/stories/screens/story_generating_screen.dart';
 import '../features/stories/screens/story_library_screen.dart';
 import '../features/stories/screens/story_preview_screen.dart';
+import '../policy/age_experience_policy.dart';
 import 'providers.dart';
 
 /// Paths of every screen, so no screen types a path by hand.
@@ -33,6 +35,7 @@ class AppRoutes {
   static const String storyLibrary = '/library';
   static const String storyViewer = '/story';
   static const String storyComplete = '/story-complete';
+  static const String reader = '/read';
 
   /// The preview path for one story, e.g. `/story-preview?id=story-1`.
   static String storyPreviewOf(String storyId) {
@@ -42,6 +45,19 @@ class AppRoutes {
   /// The child's viewer path for one story, e.g. `/story?id=story-1`.
   static String storyViewerOf(String storyId) {
     return '$storyViewer?id=$storyId';
+  }
+
+  /// The Reader Mode path for one story, e.g. `/read?id=story-1`.
+  static String readerOf(String storyId) {
+    return '$reader?id=$storyId';
+  }
+
+  /// Where a story opens for this age group: Reader Mode (5–7) or the viewer (2–4) (FR-MODE-01).
+  static String openStoryOf(AgeExperiencePolicy policy, String storyId) {
+    if (policy.readsAloud) {
+      return readerOf(storyId);
+    }
+    return storyViewerOf(storyId);
   }
 
   /// Story complete for one finished reading, e.g. `/story-complete?id=s1&words=18&stars=6`.
@@ -145,6 +161,11 @@ GoRouter buildRouter(Ref ref) {
         path: AppRoutes.storyViewer,
         builder: (context, state) =>
             StoryViewerScreen(storyId: state.uri.queryParameters['id'] ?? ''),
+      ),
+      GoRoute(
+        path: AppRoutes.reader,
+        builder: (context, state) =>
+            ReaderScreen(storyId: state.uri.queryParameters['id'] ?? ''),
       ),
       GoRoute(
         path: AppRoutes.storyComplete,
