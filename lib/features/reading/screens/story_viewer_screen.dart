@@ -6,7 +6,7 @@ import '../../../app/app_colors.dart';
 import '../../../app/providers.dart';
 import '../../../app/router.dart';
 import '../../../core/constants/app_fonts.dart';
-import '../../../core/widgets/child_home_button.dart';
+import '../../../core/widgets/child_scaffold.dart';
 import '../../../core/widgets/round_icon_button.dart';
 import '../../../services/text_to_speech_service.dart';
 import '../../children/controllers/active_child.dart';
@@ -103,30 +103,34 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = AppColors.of(context);
     final viewer = ref.watch(storyViewerProvider(widget.storyId));
+    final loaded = viewer.value;
 
-    return Scaffold(
-      backgroundColor: colors.background,
-      body: SafeArea(
-        child: viewer.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => ViewerMessage(
-            text: 'Could not open this story.',
-            onRetry: () => ref.invalidate(storyViewerProvider(widget.storyId)),
-          ),
-          data: (data) {
-            if (data == null) {
-              return const ViewerMessage(text: 'This story is not ready yet.');
-            }
-            return _buildPage(data);
-          },
+    // ── Back, Read aloud (once the story is loaded) and Home: ChildScaffold ──
+    Widget? readAloud;
+    if (loaded != null) {
+      readAloud = RoundIconButton(
+        icon: Icons.volume_up_rounded,
+        tooltip: 'Read aloud',
+        onPressed: () => _readAloud(loaded),
+      );
+    }
+    return ChildScaffold(
+      onBack: () => context.go(AppRoutes.pathMap),
+      topRight: readAloud,
+      body: viewer.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => ViewerMessage(
+          text: 'Could not open this story.',
+          onRetry: () => ref.invalidate(storyViewerProvider(widget.storyId)),
         ),
+        data: (data) {
+          if (data == null) {
+            return const ViewerMessage(text: 'This story is not ready yet.');
+          }
+          return _buildPage(data);
+        },
       ),
-
-      // ── Home button (fixed bottom-centre, SRS 10.9) ──
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: const ChildHomeButton(),
     );
   }
 
@@ -134,27 +138,9 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
     final colors = AppColors.of(context);
     final scene = data.scenes[_page];
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         children: [
-          // ── Back and Read aloud ──
-          Row(
-            children: [
-              RoundIconButton(
-                icon: Icons.arrow_back_ios_new,
-                tooltip: 'Back',
-                onPressed: () => context.go(AppRoutes.pathMap),
-              ),
-              const Spacer(),
-              RoundIconButton(
-                icon: Icons.volume_up_rounded,
-                tooltip: 'Read aloud',
-                onPressed: () => _readAloud(data),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
           // ── Scene picture (or scenery if it is missing) ──
           Container(
             clipBehavior: Clip.antiAlias,

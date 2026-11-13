@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/app_colors.dart';
 import '../../../app/providers.dart';
 import '../../../app/router.dart';
 import '../../../core/errors/speech_failure.dart';
-import '../../../core/widgets/child_home_button.dart';
+import '../../../core/widgets/child_scaffold.dart';
+import '../../../core/widgets/star_count_chip.dart';
 import '../../../services/text_to_speech_service.dart';
 import '../../children/controllers/active_child.dart';
 import '../controllers/reader_step.dart';
@@ -187,45 +187,38 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = AppColors.of(context);
     final viewer = ref.watch(storyViewerProvider(widget.storyId));
     final balance = ref.watch(activeChildProvider)?.starBalance ?? 0;
 
-    return Scaffold(
-      backgroundColor: colors.background,
-      body: SafeArea(
-        child: viewer.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => ViewerMessage(
-            text: 'Could not open this story.',
-            onRetry: () => ref.invalidate(storyViewerProvider(widget.storyId)),
-          ),
-          data: (data) {
-            if (data == null) {
-              return const ViewerMessage(text: 'This story is not ready yet.');
-            }
-            return ReaderPage(
-              scene: data.scenes[_page],
-              pageIndex: _page,
-              pageCount: data.scenes.length,
-              stars: balance + _storyStars,
-              step: _step,
-              check: _check,
-              problem: _problem,
-              onBack: () => context.go(AppRoutes.pathMap),
-              onMic: () => _startReading(data),
-              onStop: () => _stopReading(data),
-              onReadAgain: _readAgain,
-              onNext: () => _next(data),
-              onReplay: (text) => _voice.speak(text, data.story.language),
-            );
-          },
+    // ── Back, the star count and Home: ChildScaffold ──
+    return ChildScaffold(
+      onBack: () => context.go(AppRoutes.pathMap),
+      topRight: StarCountChip(stars: balance + _storyStars),
+      body: viewer.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => ViewerMessage(
+          text: 'Could not open this story.',
+          onRetry: () => ref.invalidate(storyViewerProvider(widget.storyId)),
         ),
+        data: (data) {
+          if (data == null) {
+            return const ViewerMessage(text: 'This story is not ready yet.');
+          }
+          return ReaderPage(
+            scene: data.scenes[_page],
+            pageIndex: _page,
+            pageCount: data.scenes.length,
+            step: _step,
+            check: _check,
+            problem: _problem,
+            onMic: () => _startReading(data),
+            onStop: () => _stopReading(data),
+            onReadAgain: _readAgain,
+            onNext: () => _next(data),
+            onReplay: (text) => _voice.speak(text, data.story.language),
+          );
+        },
       ),
-
-      // ── Home button (fixed bottom-centre, SRS 10.9) ──
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: const ChildHomeButton(),
     );
   }
 }

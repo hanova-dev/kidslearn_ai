@@ -1,7 +1,7 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 11 Nov 2026 (Week 4 task 3: basic Reader Mode). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/, m6_story_complete_2026-11-06/ and m6_reader_mode_2026-11-11/.
+Last update: 13 Nov 2026 (ChildScaffold, FR-HCI-04). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/, m6_story_complete_2026-11-06/, m6_reader_mode_2026-11-11/ and m1_child_scaffold_2026-11-13/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
@@ -20,7 +20,7 @@ Last update: 11 Nov 2026 (Week 4 task 3: basic Reader Mode). Emulator test evide
 | FR-AUTH-05 | Profile picker (who's reading?) | In progress | **Emulator 28 Oct:** child card shown; tap → "Hi, Ali!"; Home returns. **5 Nov:** tapping Ali or Sara now opens their real path map with their own buddy. Waiting for quiz |
 | FR-AUTH-06 | Session kept locally (offline) | In progress | **Emulator 28 Oct:** force-close while unlocked → reopens on Who's reading, locked, still signed in, child kept (decision 016). Waiting for quiz |
 | FR-HCI-01 | AgeExperiencePolicy (Listener/Reader) | In progress | `lib/policy/age_experience_policy.dart`: ListenerPolicy / ReaderPolicy (mode, mic, touch target, text size), `activePolicyProvider`; used by the path map, Story complete and StoryFinisher (decision 029). Unit + widget tested. Emulator 11 Nov: Ali (5–7) opens Reader Mode, Sara (2–4) the viewer. Gestures and the full route graph per policy are not built. |
-| FR-HCI-04 | Fixed back/home/help positions (ChildScaffold) | Not started | |
+| FR-HCI-04 | Fixed back/home/help positions (ChildScaffold) | In progress | `lib/core/widgets/child_scaffold.dart`: Back top-left, Home bottom-centre, a top-right slot as in the designs, no Help button (decision 030). Path map, story viewer and Reader Mode use it. Widget tested (3). **Emulator 13 Nov:** Back (126, 223) and Home (540, 2211) identical on all three screens. Waiting for quiz |
 | FR-HCI-05 | No solid red; colour + icon + sound | In progress | Reader Mode: green / amber / soft coral + underline style + banner icon + the phone's voice (decisions 008, 029; no sound files). Widget tested; emulator 11 Nov: day and night checked, voice spoke the feedback. |
 
 ## M2 — Story generation (Hanan)
@@ -85,6 +85,6 @@ Last update: 11 Nov 2026 (Week 4 task 3: basic Reader Mode). Emulator test evide
 |---|---|---|---|
 | NFR-SEC-03 | Keys never in source control | In progress | env/ in .gitignore; check before first commit |
 | NFR-USE-03 | Plain-language errors with retry | In progress | Login errors mapped to plain sentences (AuthFailure) |
-| NFR-REL-02 | 15 s timeout, 2 retries | In progress | Done for Groq story calls; FLUX and Whisper later |
+| NFR-REL-02 | 15 s timeout, 2 retries | In progress | Groq story calls: 15 s, 2 retries. FLUX: 2 retries (FR-ILLUS-04). Whisper: 15 s, no retries on purpose; the phone recogniser takes over instead (decision 028). |
 | NFR-REL-05 | Fallback adapter for every AI service | In progress | Pictures: placeholder (FR-ILLUS-06). Speech: phone recogniser (decision 028, unit-tested) |
 | NFR-PERF-01 | Verdict ≤ 300 ms | In progress | `phonetic_scorer_speed_test.dart` + `tool/scorer_speed_check.dart` (0.75 ms on the laptop); phone not measured |

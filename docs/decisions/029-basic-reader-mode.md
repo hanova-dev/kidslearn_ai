@@ -24,4 +24,4 @@
 - 20 new tests (207 in total). **Emulator (11 Nov):** permission dialog; recording; WAV deleted; coloured words in day and night; offline → "Let's read that sentence once more" → phone recogniser; READER session +6 saved; story 3 unlocked the path.
 - The emulator hears the laptop speaker very quietly (about 7% of full scale), so **reading accuracy was not judged**. A real voice on the phone is still needed.
 - On the emulator, the phone's recogniser needed the internet (no offline English pack) and stopped after about 1 s of silence.
-- `reader_screen.dart` is 231 lines, a little above the 200-line aim.
+- `reader_screen.dart` is 231 lines, a little above the 200-line aim (224 after ChildScaffold, 13 Nov).

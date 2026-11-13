@@ -5,14 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../../app/router.dart';
 import '../../../core/constants/buddies.dart';
 import '../../../core/widgets/buddy_face.dart';
-import '../../../core/widgets/child_home_button.dart';
-import '../../../core/widgets/scenery_background.dart';
+import '../../../core/widgets/child_scaffold.dart';
+import '../../../core/widgets/star_count_chip.dart';
 import '../../children/controllers/active_child.dart';
 import '../../children/controllers/active_policy.dart';
 import '../controllers/path_map_provider.dart';
 import '../controllers/path_node.dart';
 import 'path_map_view.dart';
-import 'path_top_bar.dart';
 
 /// The child's story path: approved stories as circles, one at a time (design p15, FR-MODE-01, D1, D6).
 class PathMapScreen extends ConsumerWidget {
@@ -41,50 +40,34 @@ class PathMapScreen extends ConsumerWidget {
       buddy = Buddies.byId(child.buddyId);
     }
 
-    return Scaffold(
-      body: SceneryBackground(
-        child: SafeArea(
-          child: Column(
-            children: [
-              PathTopBar(
-                stars: child?.starBalance ?? 0,
-                onBack: () => context.go(AppRoutes.whoIsReading),
-              ),
+    return ChildScaffold(
+      scenery: true,
+      onBack: () => context.go(AppRoutes.whoIsReading),
+      topCentre: StarCountChip(stars: child?.starBalance ?? 0),
 
-              // ── Path, or a message ──
-              Expanded(
-                child: path.when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) => _PathMessage(
-                    buddy: buddy,
-                    title: 'Could not load your stories.',
-                    onRetry: () => ref.invalidate(pathMapProvider),
-                  ),
-                  data: (nodes) {
-                    if (nodes.isEmpty) {
-                      return _PathMessage(
-                        buddy: buddy,
-                        title: 'No stories yet.',
-                        subtitle: 'Ask a grown-up to make one!',
-                      );
-                    }
-                    return PathMapView(
-                      nodes: nodes,
-                      buddy: buddy,
-                      onTapNode: (node) => _openStory(context, ref, node),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+      // ── Path, or a message ──
+      body: path.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => _PathMessage(
+          buddy: buddy,
+          title: 'Could not load your stories.',
+          onRetry: () => ref.invalidate(pathMapProvider),
         ),
+        data: (nodes) {
+          if (nodes.isEmpty) {
+            return _PathMessage(
+              buddy: buddy,
+              title: 'No stories yet.',
+              subtitle: 'Ask a grown-up to make one!',
+            );
+          }
+          return PathMapView(
+            nodes: nodes,
+            buddy: buddy,
+            onTapNode: (node) => _openStory(context, ref, node),
+          );
+        },
       ),
-
-      // ── Home button (fixed bottom-centre, SRS 10.9) ──
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: const ChildHomeButton(),
     );
   }
 }

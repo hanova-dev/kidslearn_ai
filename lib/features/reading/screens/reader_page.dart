@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/app_colors.dart';
-import '../../../core/widgets/round_icon_button.dart';
-import '../../../core/widgets/star_count_chip.dart';
 import '../../../data/models/scene.dart';
 import '../../../policy/age_experience_policy.dart';
 import '../controllers/reader_step.dart';
@@ -14,18 +12,16 @@ import 'reader_sentence.dart';
 import 'scene_picture.dart';
 import 'verdict_style.dart';
 
-/// One Reader Mode page: Back and stars, picture, sentence, feedback and the controls (designs p18–p20).
+/// One Reader Mode page under the ChildScaffold top bar: picture, sentence, feedback and the controls (designs p18–p20).
 class ReaderPage extends StatelessWidget {
   const ReaderPage({
     super.key,
     required this.scene,
     required this.pageIndex,
     required this.pageCount,
-    required this.stars,
     required this.step,
     required this.check,
     required this.problem,
-    required this.onBack,
     required this.onMic,
     required this.onStop,
     required this.onReadAgain,
@@ -36,11 +32,9 @@ class ReaderPage extends StatelessWidget {
   final Scene scene;
   final int pageIndex;
   final int pageCount;
-  final int stars;
   final ReaderStep step;
   final SentenceCheck? check;
   final String? problem;
-  final VoidCallback onBack;
   final VoidCallback onMic;
   final VoidCallback onStop;
   final VoidCallback onReadAgain;
@@ -55,23 +49,9 @@ class ReaderPage extends StatelessWidget {
     final results = check?.results ?? const [];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         children: [
-          // ── Back and the star count ──
-          Row(
-            children: [
-              RoundIconButton(
-                icon: Icons.arrow_back_ios_new,
-                tooltip: 'Back',
-                onPressed: onBack,
-              ),
-              const Spacer(),
-              StarCountChip(stars: stars),
-            ],
-          ),
-          const SizedBox(height: 16),
-
           // ── Scene picture (or scenery if it is missing) ──
           Container(
             clipBehavior: Clip.antiAlias,
