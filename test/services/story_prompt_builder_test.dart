@@ -128,5 +128,19 @@ void main() {
       expect(rules, contains('violence'));
       expect(rules, contains('exactly 6 scenes'));
     });
+
+    // ── Story shape (decision 031) ──
+    test(
+      'the system prompt asks for one connected story with a clear shape',
+      () {
+        final rules = StoryPromptBuilder.systemPrompt.toLowerCase();
+
+        expect(rules, contains('one complete sentence of 6 to 15 words'));
+        expect(rules, contains('one connected story'));
+        expect(rules, contains('a small everyday problem'));
+        expect(rules, contains('the good thing is the lesson itself'));
+        expect(rules, contains('never by a name'));
+      },
+    );
   });
 }

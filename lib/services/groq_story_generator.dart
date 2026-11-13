@@ -61,7 +61,7 @@ class GroqStoryGenerator implements StoryGenerationService {
     // ── Build request body ──
     final body = jsonEncode({
       'model': modelId,
-      'reasoning_effort': 'low',
+      'reasoning_effort': 'medium',
       'messages': [
         {'role': 'system', 'content': StoryPromptBuilder.systemPrompt},
         {'role': 'user', 'content': StoryPromptBuilder.userMessage(prompt)},

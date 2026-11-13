@@ -1,7 +1,7 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 13 Nov 2026 (ChildScaffold, FR-HCI-04). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/, m6_story_complete_2026-11-06/, m6_reader_mode_2026-11-11/ and m1_child_scaffold_2026-11-13/.
+Last update: 13 Nov 2026 (ChildScaffold, FR-HCI-04; better story prompt, decision 031). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/, m6_story_complete_2026-11-06/, m6_reader_mode_2026-11-11/ and m1_child_scaffold_2026-11-13/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
@@ -27,7 +27,7 @@ Last update: 13 Nov 2026 (ChildScaffold, FR-HCI-04). Emulator test evidence: not
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
 | FR-STORY-01 | Free-text prompt + language input | In progress | Create story screen (p7): text or value chip, child chips, English only (decisions 005, 019). **Emulator 2 Nov:** real Groq story for Sara ("Sky Shares Her Colors", 6 scenes). Waiting for quiz |
-| FR-STORY-02 | StoryGenerationService → GroqStoryGenerator (JSON) | In progress | Service + adapter built, 7 mocked tests, real call OK 28 Oct (decisions 013, 017); used by screens in task 3 |
+| FR-STORY-02 | StoryGenerationService → GroqStoryGenerator (JSON) | In progress | Service + adapter built, 7 mocked tests, real call OK 28 Oct (decisions 013, 017); used by screens in task 3 **13 Nov (decision 031):** prompt rewritten for one connected story (6-step shape, complete 6–15-word sentences, named friend, medium reasoning); 4 real before/after stories in notes/images/m2_story_quality_2026-11-13/. |
 | FR-STORY-03 | Cache DRAFT in SQLite before network | In progress | StoryCreationController saves DRAFT before the Groq call (test checks the order). **Emulator 2 Nov:** offline story row saved with prompt_value 'Kindness'. Waiting for quiz (decisions 018, 019) |
 | FR-STORY-04 | DRAFT / GENERATING / READY / FAILED + retry | In progress | Story generating screen (p8) + Try again. **Emulator 2 Nov:** writing screen seen; offline → "No internet…" + row FAILED; online + Try again → same story READY, 6 scenes. READY now only after all pictures (decision 020). **Story library (design p9, decision 023), emulator 4 Nov:** badges Writing…/Drawing…/Needs check/Approved/Stopped; a force-stopped story turned from GENERATING to FAILED at the next start and showed "Stopped". Waiting for quiz |
 | FR-STORY-05 | Reject too-short prompts | In progress | StoryInputCheck, 15–300 letters in AppConfig, 6 tests. **Emulator 2 Nov:** empty → "Tell us what the story should teach…"; "Sara hits" → "Please write a little more…"; nothing sent. Waiting for quiz |

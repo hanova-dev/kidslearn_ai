@@ -79,7 +79,7 @@ void main() {
 
       expect(sent.headers['Authorization'], 'Bearer test-key');
       expect(body['model'], 'openai/gpt-oss-120b');
-      expect(body['reasoning_effort'], 'low');
+      expect(body['reasoning_effort'], 'medium');
       expect(body['response_format']['json_schema']['strict'], isTrue);
       expect(body['messages'][0]['content'], StoryPromptBuilder.systemPrompt);
       expect(body['messages'][1]['content'], contains('Mango the fox'));
