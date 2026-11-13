@@ -22,8 +22,8 @@ class StoryInfoBox extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              "We'll write ${AppConfig.scenesPerStory} short "
-              'scenes and draw each one with the same characters.',
+              "We'll write a ${AppConfig.scenesPerStory}-page story "
+              'and draw every page with the same characters.',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),

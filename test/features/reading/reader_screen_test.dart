@@ -136,7 +136,7 @@ void main() {
     await readSentence(tester, 'The hops');
 
     expect(find.bySemanticsLabel('rabbit, try again'), findsOneWidget);
-    expect(find.text('+1'), findsOneWidget);
+    expect(find.text('+2'), findsOneWidget);
     expect(voice.spoken, contains("Let's try that one together: rabbit"));
   });
 

@@ -12,15 +12,17 @@ class NarrativeResult {
   final String title;
   final String moralValue;
 
-  /// Fixed look of the hero, put before every image prompt (FR-ILLUS-01).
+  /// Fixed looks of the hero and the friends, put before every image prompt (FR-ILLUS-01).
   final String characterSheet;
   final List<NarrativeScene> scenes;
 
-  /// Builds the result from the model's JSON answer.
+  /// Builds the result from the model's JSON answer; pages come as page_1, page_2, … (decision 032).
   factory NarrativeResult.fromMap(Map<String, dynamic> map) {
+    final pages = map['pages'] as Map<String, dynamic>;
     final scenes = <NarrativeScene>[];
-    for (final item in map['scenes'] as List<dynamic>) {
-      scenes.add(NarrativeScene.fromMap(item as Map<String, dynamic>));
+    for (var number = 1; number <= pages.length; number++) {
+      final page = pages['page_$number'] as Map<String, dynamic>;
+      scenes.add(NarrativeScene.fromMap(page));
     }
     return NarrativeResult(
       title: map['title'] as String,

@@ -31,7 +31,7 @@ class ReaderScreen extends ConsumerStatefulWidget {
 
 class _ReaderScreenState extends ConsumerState<ReaderScreen> {
   /// The microphone turns itself off after this long (FR-STT-01).
-  static const Duration longestReading = Duration(seconds: 20);
+  static const Duration longestReading = Duration(seconds: 45);
 
   int _page = 0;
   ReaderStep _step = ReaderStep.ready;

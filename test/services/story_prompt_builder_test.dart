@@ -126,20 +126,22 @@ void main() {
 
       expect(rules, contains('aged 2 to 7'));
       expect(rules, contains('violence'));
-      expect(rules, contains('exactly 6 scenes'));
+      expect(rules, contains('exactly 12 pages'));
     });
 
-    // ── Story shape (decision 031) ──
+    // ── Story shape (decisions 031, 032) ──
     test(
       'the system prompt asks for one connected story with a clear shape',
       () {
         final rules = StoryPromptBuilder.systemPrompt.toLowerCase();
 
-        expect(rules, contains('one complete sentence of 6 to 15 words'));
-        expect(rules, contains('one connected story'));
+        expect(rules, contains('2 or 3 complete sentences, 20 to 40 words'));
+        expect(rules, contains('one connected little adventure'));
+        expect(rules, contains('never a list of routines'));
         expect(rules, contains('a small everyday problem'));
         expect(rules, contains('the good thing is the lesson itself'));
         expect(rules, contains('never by a name'));
+        expect(rules, contains('never by name'));
       },
     );
   });

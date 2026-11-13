@@ -27,7 +27,7 @@ void main() {
 
     expect(speech.startedLanguages, ['en']);
     expect(check.results.length, 6);
-    expect(check.weakest, Verdict.correct);
+    expect(check.overall, Verdict.correct);
     expect(check.stars, 3);
   });
 
@@ -43,8 +43,8 @@ void main() {
       );
 
       expect(check.results[2].verdict, Verdict.tryAgain);
-      expect(check.wordToPractise, 'rabbit');
-      expect(check.stars, 1);
+      expect(check.wordToPractise?.word, 'rabbit');
+      expect(check.stars, 2);
     },
   );
 

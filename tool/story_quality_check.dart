@@ -49,17 +49,19 @@ Future<void> main() async {
     try {
       final story = await generator.generateNarrative(prompt);
       print('Title: ${story.title}  (${stopwatch.elapsedMilliseconds} ms)');
+      print('Characters: ${story.characterSheet}');
       for (var i = 0; i < story.scenes.length; i++) {
         final text = story.scenes[i].text;
         final words = text.split(' ').where((w) => w.isNotEmpty).length;
         print('  ${i + 1}. $text  ($words words)');
+        print('     picture: ${story.scenes[i].imagePrompt}');
       }
     } on StoryGenerationFailure catch (failure) {
       print('Failed: ${failure.message}');
     }
     print('');
 
-    // ── Pause, so four quick calls stay inside the free per-minute limit ──
-    await Future.delayed(const Duration(seconds: 20));
+    // ── Pause, so each story has its own minute of the free token limit ──
+    await Future.delayed(const Duration(seconds: 60));
   }
 }

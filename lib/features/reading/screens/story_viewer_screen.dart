@@ -8,6 +8,7 @@ import '../../../app/router.dart';
 import '../../../core/constants/app_fonts.dart';
 import '../../../core/widgets/child_scaffold.dart';
 import '../../../core/widgets/round_icon_button.dart';
+import '../../../policy/age_experience_policy.dart';
 import '../../../services/text_to_speech_service.dart';
 import '../../children/controllers/active_child.dart';
 import '../controllers/story_finisher.dart';
@@ -149,7 +150,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
               border: Border.all(color: colors.border, width: 2),
             ),
             child: AspectRatio(
-              aspectRatio: 1.15,
+              aspectRatio: 1.4,
               child: ScenePicture(path: scene.imagePath),
             ),
           ),
@@ -164,7 +165,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
                   scene.text,
                   style: TextStyle(
                     fontFamily: AppFonts.andika,
-                    fontSize: 30,
+                    fontSize: const ListenerPolicy().storyTextSize,
                     height: 1.4,
                     color: colors.ink,
                   ),

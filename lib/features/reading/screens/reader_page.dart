@@ -60,7 +60,7 @@ class ReaderPage extends StatelessWidget {
               border: Border.all(color: colors.border, width: 2),
             ),
             child: AspectRatio(
-              aspectRatio: 1.5,
+              aspectRatio: 1.7,
               child: ScenePicture(path: scene.imagePath),
             ),
           ),
@@ -112,7 +112,7 @@ class ReaderPage extends StatelessWidget {
     if (result == null) {
       return const SizedBox.shrink();
     }
-    final style = VerdictStyle.of(result.weakest, colors);
+    final style = VerdictStyle.of(result.overall, colors);
     return ReaderBanner(
       color: style.color,
       icon: style.icon,

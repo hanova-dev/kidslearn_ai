@@ -22,7 +22,7 @@ abstract class AgeExperiencePolicy {
   /// The smallest button size on child screens (SRS 10.7).
   double get touchTarget;
 
-  /// The size of the story sentence (SRS 10.7).
+  /// The size of the page text (SRS 10.7; smaller for 2–3 sentences, decision 032).
   double get storyTextSize;
 }
 
@@ -40,7 +40,7 @@ class ListenerPolicy extends AgeExperiencePolicy {
   double get touchTarget => AppSizes.listenerTouchTarget;
 
   @override
-  double get storyTextSize => 30;
+  double get storyTextSize => 24;
 }
 
 /// Ages 5–7: Reader Mode, the child reads each sentence aloud and sees coloured words.
@@ -57,5 +57,5 @@ class ReaderPolicy extends AgeExperiencePolicy {
   double get touchTarget => AppSizes.readerTouchTarget;
 
   @override
-  double get storyTextSize => 26;
+  double get storyTextSize => 22;
 }

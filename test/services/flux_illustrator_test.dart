@@ -50,6 +50,27 @@ void main() {
     expect(image.fileExtension, 'jpg');
   });
 
+  // ── Only the characters in this picture (decision 032) ──
+  test('only the sheet lines for animals in the scene are used', () {
+    const cast =
+        'The fox: small, orange fur, red scarf.\n'
+        'The bear: big, brown fur, yellow shirt.\n'
+        'The baby fox: tiny, orange fur, pink bow.';
+
+    final prompt = FluxIllustrator.buildPrompt(
+      'The fox rolls a red car to the baby fox in a garden.',
+      cast,
+    );
+
+    expect(prompt, contains('The fox: small, orange fur, red scarf.'));
+    expect(prompt, contains('The baby fox: tiny, orange fur, pink bow.'));
+    expect(prompt, isNot(contains('The bear')));
+  });
+
+  test('an old one-sentence sheet is used whole', () {
+    expect(FluxIllustrator.sheetFor('A fox plays.', sheet), sheet);
+  });
+
   test('a very long prompt is cut to 2048 characters', () {
     final prompt = FluxIllustrator.buildPrompt('a' * 3000, sheet);
 

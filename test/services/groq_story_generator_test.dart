@@ -27,15 +27,20 @@ String groqAnswer(Map<String, dynamic> story) {
   });
 }
 
-final sixSceneStory = {
-  'title': 'Mango Learns to Share',
-  'moral_value': 'Sharing',
-  'character_sheet': 'Mango is a small orange fox with a green scarf.',
-  'scenes': [
-    for (var i = 1; i <= 6; i++)
-      {'text': 'Scene $i sentence.', 'image_prompt': 'Picture $i.'},
-  ],
-};
+/// A story answer with [pageCount] pages, as page_1, page_2, …
+Map<String, dynamic> storyWithPages(int pageCount) {
+  return {
+    'title': 'Mango Learns to Share',
+    'moral_value': 'Sharing',
+    'character_sheet': 'The fox: small, orange fur, green scarf.',
+    'pages': {
+      for (var i = 1; i <= pageCount; i++)
+        'page_$i': {'text': 'Page $i sentence.', 'image_prompt': 'Picture $i.'},
+    },
+  };
+}
+
+final twelvePageStory = storyWithPages(12);
 
 GroqStoryGenerator makeGenerator(
   MockClient client, {
@@ -51,17 +56,43 @@ GroqStoryGenerator makeGenerator(
 
 void main() {
   // ── Correct answer ──
-  test('reads a 6-scene story from a correct answer', () async {
+  test('reads a 12-page story from a correct answer', () async {
     final client = MockClient((request) async {
-      return http.Response(groqAnswer(sixSceneStory), 200);
+      return http.Response(groqAnswer(twelvePageStory), 200);
     });
 
     final story = await makeGenerator(client).generateNarrative(prompt);
 
     expect(story.title, 'Mango Learns to Share');
-    expect(story.characterSheet, contains('orange fox'));
-    expect(story.scenes.length, 6);
+    expect(story.characterSheet, contains('The fox: small, orange fur'));
+    expect(story.scenes.length, 12);
     expect(story.scenes.first.imagePrompt, 'Picture 1.');
+    expect(story.scenes.last.text, 'Page 12 sentence.');
+  });
+
+  // ── Exactly 12 pages (decision 032) ──
+  test('the schema makes all 12 pages required', () {
+    final pages = GroqStoryGenerator.storySchema['properties']['pages'];
+
+    expect(pages['required'], [for (var i = 1; i <= 12; i++) 'page_$i']);
+    expect(pages['additionalProperties'], false);
+  });
+
+  test('a story with too few pages gives the incomplete message', () async {
+    final client = MockClient((request) async {
+      return http.Response(groqAnswer(storyWithPages(7)), 200);
+    });
+
+    await expectLater(
+      makeGenerator(client).generateNarrative(prompt),
+      throwsA(
+        isA<StoryGenerationFailure>().having(
+          (failure) => failure.message,
+          'message',
+          'The story came back incomplete. Please try again.',
+        ),
+      ),
+    );
   });
 
   // ── What we send ──
@@ -71,7 +102,7 @@ void main() {
       late http.Request sent;
       final client = MockClient((request) async {
         sent = request;
-        return http.Response(groqAnswer(sixSceneStory), 200);
+        return http.Response(groqAnswer(twelvePageStory), 200);
       });
 
       await makeGenerator(client).generateNarrative(prompt);
@@ -80,6 +111,7 @@ void main() {
       expect(sent.headers['Authorization'], 'Bearer test-key');
       expect(body['model'], 'openai/gpt-oss-120b');
       expect(body['reasoning_effort'], 'medium');
+      expect(body['max_completion_tokens'], 6000);
       expect(body['response_format']['json_schema']['strict'], isTrue);
       expect(body['messages'][0]['content'], StoryPromptBuilder.systemPrompt);
       expect(body['messages'][1]['content'], contains('Mango the fox'));

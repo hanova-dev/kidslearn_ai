@@ -27,28 +27,40 @@ class GroqStoryGenerator implements StoryGenerationService {
   final Duration retryDelay;
 
   // ── JSON shape the model must return ──
-  static const Map<String, dynamic> storySchema = {
-    'type': 'object',
-    'properties': {
-      'title': {'type': 'string'},
-      'moral_value': {'type': 'string'},
-      'character_sheet': {'type': 'string'},
-      'scenes': {
-        'type': 'array',
-        'items': {
+  /// Strict mode fills every required field, so naming page_1 … page_12 forces exactly 12 pages (decision 032).
+  static Map<String, dynamic> get storySchema {
+    const pageSchema = {
+      'type': 'object',
+      'properties': {
+        'text': {'type': 'string'},
+        'image_prompt': {'type': 'string'},
+      },
+      'required': ['text', 'image_prompt'],
+      'additionalProperties': false,
+    };
+    final pages = <String, dynamic>{};
+    final pageNames = <String>[];
+    for (var number = 1; number <= AppConfig.scenesPerStory; number++) {
+      pages['page_$number'] = pageSchema;
+      pageNames.add('page_$number');
+    }
+    return {
+      'type': 'object',
+      'properties': {
+        'title': {'type': 'string'},
+        'moral_value': {'type': 'string'},
+        'character_sheet': {'type': 'string'},
+        'pages': {
           'type': 'object',
-          'properties': {
-            'text': {'type': 'string'},
-            'image_prompt': {'type': 'string'},
-          },
-          'required': ['text', 'image_prompt'],
+          'properties': pages,
+          'required': pageNames,
           'additionalProperties': false,
         },
       },
-    },
-    'required': ['title', 'moral_value', 'character_sheet', 'scenes'],
-    'additionalProperties': false,
-  };
+      'required': ['title', 'moral_value', 'character_sheet', 'pages'],
+      'additionalProperties': false,
+    };
+  }
 
   @override
   Future<NarrativeResult> generateNarrative(StoryPrompt prompt) async {
@@ -62,6 +74,7 @@ class GroqStoryGenerator implements StoryGenerationService {
     final body = jsonEncode({
       'model': modelId,
       'reasoning_effort': 'medium',
+      'max_completion_tokens': AppConfig.storyMaxTokens,
       'messages': [
         {'role': 'system', 'content': StoryPromptBuilder.systemPrompt},
         {'role': 'user', 'content': StoryPromptBuilder.userMessage(prompt)},
@@ -113,8 +126,8 @@ class GroqStoryGenerator implements StoryGenerationService {
       final message = decoded['choices'][0]['message'] as Map<String, dynamic>;
       final story = jsonDecode(message['content'] as String);
       final result = NarrativeResult.fromMap(story as Map<String, dynamic>);
-      if (result.scenes.isEmpty) {
-        throw const FormatException('No scenes');
+      if (result.scenes.length != AppConfig.scenesPerStory) {
+        throw const FormatException('Wrong number of pages');
       }
       return result;
     } on FormatException {

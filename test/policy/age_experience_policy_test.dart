@@ -11,7 +11,7 @@ void main() {
     expect(policy.readsAloud, isFalse);
     expect(policy.sessionMode, 'LISTENER');
     expect(policy.touchTarget, 64);
-    expect(policy.storyTextSize, 30);
+    expect(policy.storyTextSize, 24);
   });
 
   test('5-7 gets the Reader policy: reads aloud', () {

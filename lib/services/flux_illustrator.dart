@@ -33,10 +33,36 @@ class FluxIllustrator implements IllustrationService {
   /// The API accepts at most this many prompt characters.
   static const int maxPromptLength = 2048;
 
+  // ── Only the characters in this picture (decision 032) ──
+  /// The sheet lines ("The fox: …") whose animal is named in [scenePrompt]; the whole sheet if none match.
+  static String sheetFor(String scenePrompt, String characterSheet) {
+    final scene = scenePrompt.toLowerCase();
+    final kept = <String>[];
+    for (final line in characterSheet.split('\n')) {
+      final colon = line.indexOf(':');
+      if (colon <= 0) {
+        continue;
+      }
+      final animal = line
+          .substring(0, colon)
+          .toLowerCase()
+          .replaceFirst('the ', '')
+          .trim();
+      if (animal.isNotEmpty && scene.contains(animal)) {
+        kept.add(line.trim());
+      }
+    }
+    if (kept.isEmpty) {
+      return characterSheet;
+    }
+    return kept.join(' ');
+  }
+
   // ── Build the full prompt ──
-  /// Style text, then the character sheet, then the scene, cut to [maxPromptLength].
+  /// Style text, then the sheet lines for this picture, then the scene, cut to [maxPromptLength].
   static String buildPrompt(String scenePrompt, String characterSheet) {
-    final prompt = '$styleText Character: $characterSheet Scene: $scenePrompt';
+    final characters = sheetFor(scenePrompt, characterSheet);
+    final prompt = '$styleText Characters: $characters Scene: $scenePrompt';
     if (prompt.length <= maxPromptLength) {
       return prompt;
     }

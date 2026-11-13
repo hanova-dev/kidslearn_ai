@@ -25,7 +25,7 @@ class ReaderSentence extends StatelessWidget {
     }
     return SizedBox(
       width: double.infinity,
-      child: Wrap(spacing: 6, runSpacing: 8, children: chips),
+      child: Wrap(spacing: 4, runSpacing: 6, children: chips),
     );
   }
 
@@ -36,7 +36,7 @@ class ReaderSentence extends StatelessWidget {
     // ── Not scored yet: plain text, same padding so nothing jumps later ──
     if (verdict == null) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         child: Text(word.text, style: _textStyle(colors.ink)),
       );
     }
@@ -60,7 +60,7 @@ class ReaderSentence extends StatelessWidget {
       label: '${word.text}, ${style.label}',
       excludeSemantics: true,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         decoration: BoxDecoration(
           color: Color.lerp(colors.surface, style.color, 0.28),
           borderRadius: BorderRadius.circular(10),

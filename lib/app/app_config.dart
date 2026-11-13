@@ -25,7 +25,10 @@ class AppConfig {
   // ── Limits (NFR-REL-02) ──
   static const Duration requestTimeout = Duration(seconds: 15);
   static const int maxRetries = 2;
-  static const int scenesPerStory = 6;
+  static const int scenesPerStory = 12;
+
+  /// Room for the model's thinking plus 12 pages; without it Groq stops early (decision 032).
+  static const int storyMaxTokens = 6000;
   static const int imageSteps = 4;
 
   // ── Story prompt length (FR-STORY-05) ──
