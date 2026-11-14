@@ -27,8 +27,13 @@ class AppConfig {
   static const int maxRetries = 2;
   static const int scenesPerStory = 12;
 
-  /// Room for the model's thinking plus 12 pages; without it Groq stops early (decision 032).
-  static const int storyMaxTokens = 6000;
+  /// Room for the model's thinking plus 12 pages; without it Groq stops early (decisions 032, 033).
+  ///
+  /// Prompt (about 1,700) + this must stay under Groq's free 8,000 tokens per minute.
+  static const int storyMaxTokens = 5000;
+
+  /// How much the story model thinks first; low answers in about 3 s with about 1,200 tokens (decision 033).
+  static const String storyReasoningEffort = 'low';
   static const int imageSteps = 4;
 
   // ── Story prompt length (FR-STORY-05) ──

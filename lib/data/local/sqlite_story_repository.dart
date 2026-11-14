@@ -65,6 +65,7 @@ class SqliteStoryRepository implements StoryRepository {
           imagePrompt: narrative.scenes[i].imagePrompt,
           imagePath: null,
           imageSource: null,
+          motion: narrative.scenes[i].motion,
         );
         await txn.insert('scenes', scene.toMap());
       }

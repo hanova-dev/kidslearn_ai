@@ -28,14 +28,18 @@ class GroqStoryGenerator implements StoryGenerationService {
 
   // ── JSON shape the model must return ──
   /// Strict mode fills every required field, so naming page_1 … page_12 forces exactly 12 pages (decision 032).
+  ///
+  /// Motion is one short line per page ("pan_left right hop rain surprised ball"); the word lists are in
+  /// the prompt once and MotionDirectiveParser checks them, which keeps the request under the free token limit (decision 033).
   static Map<String, dynamic> get storySchema {
     const pageSchema = {
       'type': 'object',
       'properties': {
         'text': {'type': 'string'},
         'image_prompt': {'type': 'string'},
+        'motion': {'type': 'string'},
       },
-      'required': ['text', 'image_prompt'],
+      'required': ['text', 'image_prompt', 'motion'],
       'additionalProperties': false,
     };
     final pages = <String, dynamic>{};
@@ -73,7 +77,7 @@ class GroqStoryGenerator implements StoryGenerationService {
     // ── Build request body ──
     final body = jsonEncode({
       'model': modelId,
-      'reasoning_effort': 'medium',
+      'reasoning_effort': AppConfig.storyReasoningEffort,
       'max_completion_tokens': AppConfig.storyMaxTokens,
       'messages': [
         {'role': 'system', 'content': StoryPromptBuilder.systemPrompt},

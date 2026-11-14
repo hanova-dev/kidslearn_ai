@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kidslearn_ai/data/local/app_database.dart';
 import 'package:kidslearn_ai/data/local/sqlite_story_repository.dart';
+import 'package:kidslearn_ai/data/models/motion_directive.dart';
 import 'package:kidslearn_ai/data/models/narrative_result.dart';
 import 'package:kidslearn_ai/data/models/narrative_scene.dart';
 import 'package:kidslearn_ai/data/models/story.dart';
@@ -109,6 +110,40 @@ void main() {
     expect(scenes.first.sequenceNumber, 1);
     expect(scenes.last.text, 'Sentence 6.');
     expect(scenes.first.imagePath, isNull);
+  });
+
+  // ── Motion directives (M11, decision 033) ──
+  test('each scene keeps its motion directive', () async {
+    await repository.saveDraft(makeDraft('s7'));
+    const motion = MotionDirective(
+      camera: 'pan_left',
+      focus: 'right',
+      characterAction: 'hop',
+      effect: 'rain',
+      mood: 'surprised',
+      cueWord: 'sentence',
+    );
+
+    await repository.saveNarrative(
+      's7',
+      const NarrativeResult(
+        title: 'Rainy Day',
+        moralValue: 'Patience',
+        characterSheet: 'The fox: small, orange fur, red scarf.',
+        scenes: [
+          NarrativeScene(
+            text: 'Sentence one.',
+            imagePrompt: 'Picture one.',
+            motion: motion,
+          ),
+          NarrativeScene(text: 'Sentence two.', imagePrompt: 'Picture two.'),
+        ],
+      ),
+    );
+
+    final scenes = await repository.getScenes('s7');
+    expect(scenes.first.motion.toMap(), motion.toMap());
+    expect(scenes.last.motion.toMap(), MotionDirective.calm.toMap());
   });
 
   test('regenerating replaces the old scenes', () async {

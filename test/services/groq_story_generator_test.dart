@@ -33,9 +33,12 @@ Map<String, dynamic> storyWithPages(int pageCount) {
     'title': 'Mango Learns to Share',
     'moral_value': 'Sharing',
     'character_sheet': 'The fox: small, orange fur, green scarf.',
-    'pages': {
+    'pages': <String, Object>{
       for (var i = 1; i <= pageCount; i++)
-        'page_$i': {'text': 'Page $i sentence.', 'image_prompt': 'Picture $i.'},
+        'page_$i': <String, Object>{
+          'text': 'Page $i sentence.',
+          'image_prompt': 'Picture $i.',
+        },
     },
   };
 }
@@ -78,6 +81,32 @@ void main() {
     expect(pages['additionalProperties'], false);
   });
 
+  // ── Motion directives (M11, decision 033) ──
+  test('every page must have a motion line', () {
+    final page = GroqStoryGenerator
+        .storySchema['properties']['pages']['properties']['page_1'];
+
+    expect(page['required'], contains('motion'));
+    expect(page['properties']['motion'], {'type': 'string'});
+  });
+
+  test('a page motion is read; a broken motion becomes calm', () async {
+    final story = storyWithPages(12);
+    final pages = story['pages'] as Map<String, dynamic>;
+    (pages['page_1'] as Map<String, dynamic>)['motion'] =
+        'pan_up top sway stars_twinkle sleepy sentence';
+    (pages['page_2'] as Map<String, dynamic>)['motion'] = 'zoom!';
+    final client = MockClient((request) async {
+      return http.Response(groqAnswer(story), 200);
+    });
+
+    final result = await makeGenerator(client).generateNarrative(prompt);
+
+    expect(result.scenes[0].motion.camera, 'pan_up');
+    expect(result.scenes[0].motion.cueWord, 'sentence');
+    expect(result.scenes[1].motion.mood, 'calm');
+  });
+
   test('a story with too few pages gives the incomplete message', () async {
     final client = MockClient((request) async {
       return http.Response(groqAnswer(storyWithPages(7)), 200);
@@ -110,8 +139,8 @@ void main() {
 
       expect(sent.headers['Authorization'], 'Bearer test-key');
       expect(body['model'], 'openai/gpt-oss-120b');
-      expect(body['reasoning_effort'], 'medium');
-      expect(body['max_completion_tokens'], 6000);
+      expect(body['reasoning_effort'], 'low');
+      expect(body['max_completion_tokens'], 5000);
       expect(body['response_format']['json_schema']['strict'], isTrue);
       expect(body['messages'][0]['content'], StoryPromptBuilder.systemPrompt);
       expect(body['messages'][1]['content'], contains('Mango the fox'));

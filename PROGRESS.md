@@ -1,7 +1,7 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 13 Nov 2026 (ChildScaffold; story prompt decisions 031 and 032: 12-page stories). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/, m6_story_complete_2026-11-06/, m6_reader_mode_2026-11-11/ and m1_child_scaffold_2026-11-13/, m2_story_quality_2026-11-13/ and m2_long_stories_2026-11-13/.
+Last update: 14 Nov 2026 (M11 Motion Comic Engine phase 1: motion directives, decision 033). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/, m6_story_complete_2026-11-06/, m6_reader_mode_2026-11-11/ and m1_child_scaffold_2026-11-13/, m2_story_quality_2026-11-13/ and m2_long_stories_2026-11-13/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
@@ -27,7 +27,7 @@ Last update: 13 Nov 2026 (ChildScaffold; story prompt decisions 031 and 032: 12-
 | FR | Requirement (short) | Status | Notes |
 |---|---|---|---|
 | FR-STORY-01 | Free-text prompt + language input | In progress | Create story screen (p7): text or value chip, child chips, English only (decisions 005, 019). **Emulator 2 Nov:** real Groq story for Sara ("Sky Shares Her Colors", 6 scenes). Waiting for quiz |
-| FR-STORY-02 | StoryGenerationService → GroqStoryGenerator (JSON) | In progress | Service + adapter built, 7 mocked tests, real call OK 28 Oct (decisions 013, 017); used by screens in task 3 **13 Nov (decision 031):** prompt rewritten for one connected story (6-step shape, complete 6–15-word sentences, named friend, medium reasoning); 4 real before/after stories in notes/images/m2_story_quality_2026-11-13/. **13 Nov (decision 032):** 12 pages of 2–3 sentences, schema with required page_1…page_12, max_completion_tokens 6000; 4 real stories all 12 pages, 8–10 s; one 12-page story made and drawn in the app. |
+| FR-STORY-02 | StoryGenerationService → GroqStoryGenerator (JSON) | In progress | Service + adapter built, 7 mocked tests, real call OK 28 Oct (decisions 013, 017); used by screens in task 3 **13 Nov (decision 031):** prompt rewritten for one connected story (6-step shape, complete 6–15-word sentences, named friend, medium reasoning); 4 real before/after stories in notes/images/m2_story_quality_2026-11-13/. **13 Nov (decision 032):** 12 pages of 2–3 sentences, schema with required page_1…page_12, max_completion_tokens 6000; 4 real stories all 12 pages, 8–10 s; one 12-page story made and drawn in the app. **14 Nov (decision 033):** + motion line per page; reasoning low, answer limit 5000 (about 3 s per story). |
 | FR-STORY-03 | Cache DRAFT in SQLite before network | In progress | StoryCreationController saves DRAFT before the Groq call (test checks the order). **Emulator 2 Nov:** offline story row saved with prompt_value 'Kindness'. Waiting for quiz (decisions 018, 019) |
 | FR-STORY-04 | DRAFT / GENERATING / READY / FAILED + retry | In progress | Story generating screen (p8) + Try again. **Emulator 2 Nov:** writing screen seen; offline → "No internet…" + row FAILED; online + Try again → same story READY, 6 scenes. READY now only after all pictures (decision 020). **Story library (design p9, decision 023), emulator 4 Nov:** badges Writing…/Drawing…/Needs check/Approved/Stopped; a force-stopped story turned from GENERATING to FAILED at the next start and showed "Stopped". Waiting for quiz |
 | FR-STORY-05 | Reject too-short prompts | In progress | StoryInputCheck, 15–300 letters in AppConfig, 6 tests. **Emulator 2 Nov:** empty → "Tell us what the story should teach…"; "Sara hits" → "Please write a little more…"; nothing sent. Waiting for quiz |
@@ -79,6 +79,23 @@ Last update: 13 Nov 2026 (ChildScaffold; story prompt decisions 031 and 032: 12-
 | FR-MODE-04 | Tap-and-read before advancing | In progress | Mic → read the whole sentence → stop (decision 004); Next page appears only after a reading. Widget tested; emulator 11 Nov checked. |
 | FR-MODE-05 | Live colour feedback | In progress | After stop, every word gets its verdict colour (`ShownWord`, `ReaderSentence`); the weakest word gives the banner and the spoken feedback (`SentenceCheck`). Widget tested. Emulator 11 Nov: colours shown in day and night; accuracy with a real voice still to be checked on the phone. |
 | FR-MODE-06 | Stars on completion (simple) | In progress | Story complete (design p22, decision 026): "The end" saves a reading_sessions row and 1 star per page to star_balance; spoken "You did it, <name>!"; Next adventure / Read it again. Unit + widget tested. **Emulator 6 Nov:** Sara +6 (48 words, LISTENER); Ali story 2 → +6 and story 3 unlocked by itself; Read it again +6 → 12; stars kept after restart; night mode checked. Reader Mode will use the 3/2/1 rule (decision 009) in Week 4. Waiting for quiz Reader Mode (11 Nov, decision 029): 3/2/1 stars per sentence (decision 009), best try per page; emulator: READER session, 44 words, +6, Ali 18 → 24, story 3 finished. **13 Nov (decision 032):** Reader stars by share of words read well (≥90% 3, ≥60% 2, else 1). |
+
+## M11 (extension, team request 14 Nov) — Motion Comic Engine (Hanan)
+Draft requirements: `docs/srs_addendum_m11_motion.md`. Phases: (1) directives, parser, schema; (2) choreographer and camera; (3) narration sync and mascot mouth; (4) segmentation; (5) effects; (6) polish.
+| FR | Requirement (short) | Status | Notes |
+|---|---|---|---|
+| FR-MOTION-01 | Motion directive per scene, same request | In progress | One motion line per page, word lists once in the prompt (decision 033). Real Groq 14 Nov: 4 stories, 12 motions each, about 3.2 s. Unit-tested. Waiting for phone check and quiz |
+| FR-MOTION-02 | Validate, mood defaults, never throw | In progress | `MotionDirectiveParser` (pure Dart), 15 tests written first. Waiting for quiz |
+| FR-MOTION-03 | Store in SQLite, calm for old stories | In progress | `scenes.motion_json`, DB version 4 (migration test). **Emulator 14 Nov:** 3 → 4 kept 10 stories / 66 scenes; a new version saved motion on all 12 pages. Firestore sync waits for M9 |
+| FR-MOTION-04 | SceneChoreographer timeline | Not started | Phase 2 |
+| FR-MOTION-05 | Only the picture moves; settles before the mic | Not started | Phase 2 |
+| FR-MOTION-06 | "Remove animations" → still scene | Not started | Phase 2 |
+| FR-MOTION-07 | Cue word eases the camera | Not started | Phase 3 (needs TTS word callbacks) |
+| FR-MOTION-08 | Mascot mouth on word boundaries | Not started | Phase 3 |
+| FR-MOTION-09 | Ambient effects on device | Not started | Phase 5 (CustomPainter proposed) |
+| FR-MOTION-10 | Mirror moves for RTL | Not started | Phase 2 (pure Dart, unit-tested; Urdu UI out of scope) |
+| FR-MOTION-11 | Character layer by segmentation | Not started | Phase 4, after a test and the team's decision (ML Kit terms) |
+| FR-MOTION-12 | Degrade on dropped frames | Not started | Phase 6 |
 
 ## Cross-cutting
 | ID | Requirement (short) | Status | Notes |

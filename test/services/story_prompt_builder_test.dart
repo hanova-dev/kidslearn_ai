@@ -142,6 +142,9 @@ void main() {
         expect(rules, contains('the good thing is the lesson itself'));
         expect(rules, contains('never by a name'));
         expect(rules, contains('never by name'));
+        expect(rules, contains('each page also has a motion line'));
+        expect(rules, contains('slow_zoom_in, slow_zoom_out, pan_left'));
+        expect(rules, contains('stars_twinkle'));
       },
     );
   });

@@ -55,6 +55,7 @@ Future<void> main() async {
         final words = text.split(' ').where((w) => w.isNotEmpty).length;
         print('  ${i + 1}. $text  ($words words)');
         print('     picture: ${story.scenes[i].imagePrompt}');
+        print('     motion:  ${story.scenes[i].motion.toMap()}');
       }
     } on StoryGenerationFailure catch (failure) {
       print('Failed: ${failure.message}');

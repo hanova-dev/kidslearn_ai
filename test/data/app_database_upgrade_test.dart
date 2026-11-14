@@ -125,4 +125,54 @@ void main() {
       expect(sessions.first['stars_earned'], 0);
     },
   );
+
+  // ── A phone with the version-3 database keeps its scenes (decision 033) ──
+  test(
+    'upgrading from version 3 adds scenes.motion_json and keeps scenes',
+    () async {
+      final folder = Directory.systemTemp.createTempSync('kidslearn_db_');
+      final path = '${folder.path}/kidslearn.db';
+      addTearDown(() => folder.deleteSync(recursive: true));
+
+      // Version 3, as it was on the phone before Motion Comic phase 1.
+      var db = await databaseFactoryFfi.openDatabase(
+        path,
+        options: OpenDatabaseOptions(
+          version: 3,
+          onCreate: (db, version) async {
+            await AppDatabase.createChildProfilesTable(db);
+            await AppDatabase.createStoryTables(db);
+            await AppDatabase.createReadingSessionsTable(db);
+          },
+        ),
+      );
+      await db.insert('scenes', {
+        'scene_id': 's1-scene-1',
+        'story_id': 's1',
+        'sequence_number': 1,
+        'text': 'Mango hops home.',
+        'image_prompt': 'A fox hops.',
+        'image_path': '/files/s1-scene-1.jpg',
+        'image_source': 'FLUX',
+      });
+      await db.close();
+
+      db = await databaseFactoryFfi.openDatabase(
+        path,
+        options: OpenDatabaseOptions(
+          version: AppDatabase.version,
+          onCreate: AppDatabase.createTables,
+          onUpgrade: AppDatabase.upgradeTables,
+        ),
+      );
+      final scenes = await db.query('scenes');
+      await db.close();
+
+      expect(AppDatabase.version, 4);
+      expect(scenes.length, 1);
+      expect(scenes.first['image_path'], '/files/s1-scene-1.jpg');
+      expect(scenes.first.containsKey('motion_json'), isTrue);
+      expect(scenes.first['motion_json'], isNull);
+    },
+  );
 }

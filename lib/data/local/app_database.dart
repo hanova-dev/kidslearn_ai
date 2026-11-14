@@ -5,8 +5,8 @@ import 'package:sqflite/sqflite.dart';
 class AppDatabase {
   static const String fileName = 'kidslearn.db';
 
-  /// 1 = child_profiles; 2 = + stories and scenes; 3 = + reading_sessions.
-  static const int version = 3;
+  /// 1 = child_profiles; 2 = + stories and scenes; 3 = + reading_sessions; 4 = + scenes.motion_json.
+  static const int version = 4;
 
   /// Opens (or creates) kidslearn.db in the app's private documents folder.
   static Future<Database> open() async {
@@ -24,6 +24,7 @@ class AppDatabase {
     await createChildProfilesTable(db);
     await createStoryTables(db);
     await createReadingSessionsTable(db);
+    await addSceneMotionColumn(db);
   }
 
   /// Runs on a phone that has an older database file; keeps existing rows.
@@ -37,6 +38,9 @@ class AppDatabase {
     }
     if (oldVersion < 3) {
       await createReadingSessionsTable(db);
+    }
+    if (oldVersion < 4) {
+      await addSceneMotionColumn(db);
     }
   }
 
@@ -105,5 +109,11 @@ class AppDatabase {
         last_modified INTEGER NOT NULL
       )
     ''');
+  }
+
+  // ── Version 4: motion directives on scenes (M11, decision 033) ──
+  /// Old rows get NULL, which the app reads as the calm motion.
+  static Future<void> addSceneMotionColumn(Database db) async {
+    await db.execute('ALTER TABLE scenes ADD COLUMN motion_json TEXT');
   }
 }
