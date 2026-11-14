@@ -1,6 +1,6 @@
 # SRS Addendum (draft) — Module M11: Motion Comic Engine
 
-*Draft for KidsLearn AI SRS v1.2. Status: proposed by the team on 14 Nov 2026; not yet merged into the SRS. Phases 1–3 are built (decisions 033, 034, 035).*
+*Draft for KidsLearn AI SRS v1.2. Status: proposed by the team on 14 Nov 2026; not yet merged into the SRS. Phases 1–3 are built (decisions 033, 034, 035); phase 4 (segmentation) is not adopted (decision 036).*
 
 ## 3.11 Module M11 — Motion Comic Engine
 
@@ -31,7 +31,7 @@ Priority: Should-Have. Primary Actor: Child (playback), System (directives and p
 | Motion playback | On-device Flutter animation (`AnimationController`, `Transform`) | Still image | No service, no network, no data leaves the phone. Per-age `MotionProfile`: Listener 8 s / zoom 1.12, Reader 4 s / zoom 1.08 (decision 034). |
 | Word timing for narration sync | Phone voice word events (flutter_tts `setProgressHandler`, Android `onRangeStart`) | Word-length guess (`WordTiming`, measured on the emulator voice) | No new package; offline (decision 035). |
 | Ambient effects | Drawn on device with `CustomPainter` (proposed) | No effect | No package and no asset licences needed; `lottie` (MIT) with licensed assets was considered. |
-| Subject segmentation | Google ML Kit Subject Segmentation (candidate only) | Single layer (no segmentation) | Not adopted yet: the API is beta; the model is downloaded through Google Play services; ML Kit sends usage metrics to Google (images stay on the device); its terms do not address children's apps. To be decided after a test on our FLUX images (NFR-PRIV-06). |
+| Subject segmentation | None this semester (decision 036) | Single layer (no segmentation) | ML Kit Subject Segmentation (beta) was tested on 14 Nov: the model needed an explicit Play services install, then the native code crashed on the emulator. Also: usage metrics to Google, terms silent on children's apps (NFR-PRIV-06). Not adopted. |
 
 ## Non-functional requirement updates (proposed)
 
