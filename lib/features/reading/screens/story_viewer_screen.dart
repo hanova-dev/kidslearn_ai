@@ -7,10 +7,11 @@ import '../../../app/providers.dart';
 import '../../../app/router.dart';
 import '../../../core/constants/app_fonts.dart';
 import '../../../core/widgets/child_scaffold.dart';
+import '../../../core/widgets/lumi_mascot.dart';
 import '../../../core/widgets/round_icon_button.dart';
 import '../../../policy/age_experience_policy.dart';
-import '../../../services/text_to_speech_service.dart';
 import '../../children/controllers/active_child.dart';
+import '../controllers/narration_tracker.dart';
 import '../controllers/story_finisher.dart';
 import '../controllers/story_viewer_provider.dart';
 import 'motion_scene_player.dart';
@@ -31,25 +32,39 @@ class StoryViewerScreen extends ConsumerStatefulWidget {
 class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
   int _page = 0;
   bool _finishing = false;
-  late final TextToSpeechService _voice;
+  bool _mouthOpen = false;
+  bool _cueHeard = false;
+  late final NarrationTracker _narration;
 
   @override
   void initState() {
     super.initState();
-    _voice = ref.read(textToSpeechServiceProvider);
+    _narration = NarrationTracker(
+      voice: ref.read(textToSpeechServiceProvider),
+      onMouth: (open) => _update(() => _mouthOpen = open),
+      onCue: () => _update(() => _cueHeard = true),
+    );
   }
 
   @override
   void dispose() {
-    _voice.stop();
+    _narration.stop();
     super.dispose();
   }
 
-  // ── Read this page aloud (FR-TTS-01, FR-TTS-02) ──
+  void _update(VoidCallback change) {
+    if (mounted) {
+      setState(change);
+    }
+  }
+
+  // ── Read this page aloud; Lumi's mouth and the cue word follow the voice (FR-TTS-01, FR-MOTION-07, FR-MOTION-08) ──
   Future<void> _readAloud(StoryViewerData data) async {
-    final spoken = await _voice.speak(
-      data.scenes[_page].text,
+    final scene = data.scenes[_page];
+    final spoken = await _narration.narrate(
+      scene.text,
       data.story.language,
+      scene.motion.cueWord,
     );
     if (!spoken) {
       _showMessage(
@@ -67,8 +82,11 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
 
   // ── Turn the page ──
   void _goTo(int page) {
-    _voice.stop();
-    setState(() => _page = page);
+    _narration.stop();
+    setState(() {
+      _page = page;
+      _cueHeard = false;
+    });
   }
 
   // ── After the last page: save the reading, then celebrate (decision 026) ──
@@ -82,7 +100,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
       return;
     }
     _finishing = true;
-    _voice.stop();
+    _narration.stop();
     try {
       final result = await ref
           .read(storyFinisherProvider)
@@ -108,9 +126,13 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
     final viewer = ref.watch(storyViewerProvider(widget.storyId));
     final loaded = viewer.value;
 
-    // ── Back, Read aloud (once the story is loaded) and Home: ChildScaffold ──
+    // ── Back, Lumi, Read aloud (once the story is loaded) and Home: ChildScaffold ──
     Widget? readAloud;
+    Widget? lumi;
     if (loaded != null) {
+      lumi = ExcludeSemantics(
+        child: LumiMascot(size: 56, mouthOpen: _mouthOpen),
+      );
       readAloud = RoundIconButton(
         icon: Icons.volume_up_rounded,
         tooltip: 'Read aloud',
@@ -119,6 +141,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
     }
     return ChildScaffold(
       onBack: () => context.go(AppRoutes.pathMap),
+      topCentre: lumi,
       topRight: readAloud,
       body: viewer.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -156,6 +179,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
                 key: ValueKey(scene.id),
                 directive: scene.motion,
                 profile: const ListenerPolicy().motion,
+                cueHeard: _cueHeard,
                 child: ScenePicture(path: scene.imagePath),
               ),
             ),

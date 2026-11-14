@@ -1,6 +1,6 @@
 # SRS Addendum (draft) — Module M11: Motion Comic Engine
 
-*Draft for KidsLearn AI SRS v1.2. Status: proposed by the team on 14 Nov 2026; not yet merged into the SRS. Phase 1 (decision 033) and phase 2 (decision 034) are built.*
+*Draft for KidsLearn AI SRS v1.2. Status: proposed by the team on 14 Nov 2026; not yet merged into the SRS. Phases 1–3 are built (decisions 033, 034, 035).*
 
 ## 3.11 Module M11 — Motion Comic Engine
 
@@ -17,7 +17,7 @@ Priority: Should-Have. Primary Actor: Child (playback), System (directives and p
 | FR-MOTION-05 | The system shall animate only the picture area; story text and the word being read shall never move. In Text Mode, camera motion shall settle before the microphone is active and stay still while the child reads and is scored. | M |
 | FR-MOTION-06 | When the device setting "Remove animations" is on, the system shall show the still scene with no motion. | M |
 | FR-MOTION-07 | The system shall ease the camera to the directive's focus point when the cue word is spoken, using the TTS engine's word-progress callbacks where available and a word-length approximation otherwise (FR-TTS-04). | S |
-| FR-MOTION-08 | While the mascot narrates, the system shall switch its mouth between open and closed on word boundaries. | S |
+| FR-MOTION-08 | While the mascot (Lumi) narrates, the system shall switch its mouth between open and closed on word boundaries, at most about 3 times per second. | S |
 | FR-MOTION-09 | The system shall show ambient effects from the vocabulary, rendered on the device; a missing effect asset or renderer shall show no effect and never crash. | S |
 | FR-MOTION-10 | The system shall mirror every directional move (pans, slide-ins) when the story is shown right-to-left (Urdu). | M |
 | FR-MOTION-11 | The system shall cut the hero into its own layer once, after a scene image is saved, through a SubjectSegmentationService with an on-device primary adapter and a single-layer fallback; character offsets shall stay within about 2–3% of the picture width; placeholder images still receive camera motion. | C |
@@ -29,6 +29,7 @@ Priority: Should-Have. Primary Actor: Child (playback), System (directives and p
 |---|---|---|---|
 | Motion directives | Same Groq `openai/gpt-oss-120b` story request (one line per page) | Calm default motion | No extra call. Fits the free 8,000 tokens per minute: about 1,700 prompt + 5,000 answer limit, `reasoning_effort: low` (decision 033). |
 | Motion playback | On-device Flutter animation (`AnimationController`, `Transform`) | Still image | No service, no network, no data leaves the phone. Per-age `MotionProfile`: Listener 8 s / zoom 1.12, Reader 4 s / zoom 1.08 (decision 034). |
+| Word timing for narration sync | Phone voice word events (flutter_tts `setProgressHandler`, Android `onRangeStart`) | Word-length guess (`WordTiming`, measured on the emulator voice) | No new package; offline (decision 035). |
 | Ambient effects | Drawn on device with `CustomPainter` (proposed) | No effect | No package and no asset licences needed; `lottie` (MIT) with licensed assets was considered. |
 | Subject segmentation | Google ML Kit Subject Segmentation (candidate only) | Single layer (no segmentation) | Not adopted yet: the API is beta; the model is downloaded through Google Play services; ML Kit sends usage metrics to Google (images stay on the device); its terms do not address children's apps. To be decided after a test on our FLUX images (NFR-PRIV-06). |
 

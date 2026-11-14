@@ -13,6 +13,7 @@ class MotionScenePlayer extends StatefulWidget {
     required this.profile,
     required this.child,
     this.settled = false,
+    this.cueHeard = false,
   });
 
   final MotionDirective directive;
@@ -24,6 +25,9 @@ class MotionScenePlayer extends StatefulWidget {
   /// True stops the camera where it is and keeps it still (Reader Mode while reading).
   final bool settled;
 
+  /// Becomes true when the voice says the page's cue word; the camera then eases to the focus point.
+  final bool cueHeard;
+
   @override
   State<MotionScenePlayer> createState() => _MotionScenePlayerState();
 }
@@ -32,6 +36,7 @@ class _MotionScenePlayerState extends State<MotionScenePlayer>
     with SingleTickerProviderStateMixin {
   late final AnimationController _clock;
   MotionTimeline _timeline = MotionTimeline.still;
+  bool _reduceMotion = false;
 
   @override
   void initState() {
@@ -43,11 +48,12 @@ class _MotionScenePlayerState extends State<MotionScenePlayer>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _reduceMotion = MediaQuery.disableAnimationsOf(context);
     _timeline = const SceneChoreographer().timelineFor(
       widget.directive,
       widget.profile,
       rightToLeft: Directionality.of(context) == TextDirection.rtl,
-      reduceMotion: MediaQuery.disableAnimationsOf(context),
+      reduceMotion: _reduceMotion,
     );
     _clock.duration = Duration(milliseconds: _timeline.durationMs);
     if (_timeline.isStill || widget.settled) {
@@ -57,13 +63,36 @@ class _MotionScenePlayerState extends State<MotionScenePlayer>
     }
   }
 
-  // ── Stop the camera when Reader Mode starts the microphone ──
+  // ── Reader Mode starts the microphone: stop. The cue word is spoken: ease to the focus point ──
   @override
   void didUpdateWidget(MotionScenePlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.settled && !oldWidget.settled) {
       _clock.stop();
     }
+    if (widget.cueHeard && !oldWidget.cueHeard && !widget.settled) {
+      _easeToFocus();
+    }
+  }
+
+  // ── The cue word: a new short timeline from where the camera is now (FR-MOTION-07) ──
+  void _easeToFocus() {
+    final now = _timeline.cameraAt(_currentMs());
+    _timeline = const SceneChoreographer().cueTimelineFor(
+      now,
+      widget.directive,
+      widget.profile,
+      reduceMotion: _reduceMotion,
+    );
+    if (_timeline.isStill) {
+      return;
+    }
+    _clock.duration = Duration(milliseconds: _timeline.durationMs);
+    _clock.forward(from: 0);
+  }
+
+  int _currentMs() {
+    return (_clock.value * _timeline.durationMs).round();
   }
 
   @override
@@ -81,8 +110,7 @@ class _MotionScenePlayerState extends State<MotionScenePlayer>
           animation: _clock,
           child: widget.child,
           builder: (context, picture) {
-            final ms = (_clock.value * _timeline.durationMs).round();
-            final camera = _timeline.cameraAt(ms);
+            final camera = _timeline.cameraAt(_currentMs());
             return FractionalTranslation(
               translation: Offset(camera.dx, camera.dy),
               child: Transform.scale(scale: camera.scale, child: picture),

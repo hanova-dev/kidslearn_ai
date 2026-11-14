@@ -2,22 +2,28 @@ import 'package:flutter/material.dart';
 
 /// Lumi the fox, the app's mascot, drawn with simple shapes.
 class LumiMascot extends StatelessWidget {
-  const LumiMascot({super.key, this.size = 120});
+  const LumiMascot({super.key, this.size = 120, this.mouthOpen = false});
 
   /// Width of the mascot; the height is 10% larger.
   final double size;
+
+  /// True while a word is being spoken (FR-MOTION-08).
+  final bool mouthOpen;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: size,
       height: size * 1.1,
-      child: CustomPaint(painter: _LumiPainter()),
+      child: CustomPaint(painter: _LumiPainter(mouthOpen)),
     );
   }
 }
 
 class _LumiPainter extends CustomPainter {
+  _LumiPainter(this.mouthOpen);
+
+  final bool mouthOpen;
   static const Color orange = Color(0xFFF28A2E);
   static const Color cream = Color(0xFFFFF1DC);
   static const Color dark = Color(0xFF2A2A4A);
@@ -76,7 +82,12 @@ class _LumiPainter extends CustomPainter {
     canvas.drawCircle(const Offset(39.5, 39.5), 1.5, paint);
     canvas.drawCircle(const Offset(63.5, 39.5), 1.5, paint);
 
-    // ── Smile ──
+    // ── Open mouth while speaking, otherwise the smile ──
+    if (mouthOpen) {
+      paint.color = dark;
+      canvas.drawOval(_oval(50, 57, 9, 8), paint);
+      return;
+    }
     final smile = Path()
       ..moveTo(45, 54)
       ..quadraticBezierTo(50, 59, 55, 54);
@@ -109,6 +120,6 @@ class _LumiPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_LumiPainter oldDelegate) {
-    return false;
+    return oldDelegate.mouthOpen != mouthOpen;
   }
 }

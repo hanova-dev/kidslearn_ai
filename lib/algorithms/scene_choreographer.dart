@@ -45,6 +45,25 @@ class SceneChoreographer {
     }
   }
 
+  // ── The cue word was spoken: ease from where the camera is to the focus point (FR-MOTION-07) ──
+  /// A short timeline from [from] to the zoomed-in focus frame.
+  MotionTimeline cueTimelineFor(
+    CameraFrame from,
+    MotionDirective directive,
+    MotionProfile profile, {
+    required bool reduceMotion,
+  }) {
+    if (reduceMotion) {
+      return MotionTimeline.still;
+    }
+    final zoom = profile.maxZoom;
+    final focused = _focusFrame(directive.focus, zoom, (zoom - 1) / 2);
+    return MotionTimeline([
+      CameraKeyframe(atMs: 0, frame: from),
+      CameraKeyframe(atMs: profile.cueMs, frame: focused),
+    ]);
+  }
+
   // ── Zoomed in on the focus point (the picture is not mirrored, so focus is not either) ──
   CameraFrame _focusFrame(String focus, double zoom, double reach) {
     switch (focus) {

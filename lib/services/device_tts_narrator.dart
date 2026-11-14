@@ -19,13 +19,22 @@ class DeviceTtsNarrator implements TextToSpeechService {
 
   // ── Speak ──
   @override
-  Future<bool> speak(String text, String languageCode) async {
+  Future<bool> speak(
+    String text,
+    String languageCode, {
+    void Function(String word)? onWord,
+  }) async {
     final tag = voiceTagFor(languageCode);
     final available = await _tts.isLanguageAvailable(tag);
     if (available != true) {
       return false;
     }
     await _tts.stop();
+
+    // ── Word progress (Android onRangeStart, Android 8+) ──
+    _tts.setProgressHandler((spokenText, start, end, word) {
+      onWord?.call(word);
+    });
     await _tts.setLanguage(tag);
     await _tts.setSpeechRate(childSpeechRate);
     await _tts.speak(text);

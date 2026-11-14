@@ -1,7 +1,7 @@
 # KidsLearn AI — Progress (7th semester, ≈50% scope)
 
 Status: **Not started** · **In progress** · **Done** (Done = works on the phone + analyze/tests clean + notes written + quiz passed, SRS 12.6.2).
-Last update: 14 Nov 2026 (M11 Motion Comic Engine phase 2: choreographer and camera motion, decision 034; phase 1: motion directives, decision 033). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/, m6_story_complete_2026-11-06/, m6_reader_mode_2026-11-11/ and m1_child_scaffold_2026-11-13/, m2_story_quality_2026-11-13/ and m2_long_stories_2026-11-13/, m11_camera_2026-11-14/.
+Last update: 14 Nov 2026 (M11 Motion Comic Engine phase 3: narration sync and Lumi's mouth, decision 035; phase 2: choreographer and camera motion, decision 034; phase 1: motion directives, decision 033). Emulator test evidence: notes/images/device_test_2026-10-28/, m2_create_story_2026-11-02/, m3_illustration_2026-11-02/, m2_story_preview_2026-11-03/, m2_story_library_2026-11-04/, m6_path_map_2026-11-05/, m6_story_viewer_2026-11-05/, m6_story_complete_2026-11-06/, m6_reader_mode_2026-11-11/ and m1_child_scaffold_2026-11-13/, m2_story_quality_2026-11-13/ and m2_long_stories_2026-11-13/, m11_camera_2026-11-14/.
 
 ## Week 1 foundation
 | Item | Owner | Status | Notes |
@@ -90,8 +90,8 @@ Draft requirements: `docs/srs_addendum_m11_motion.md`. Phases: (1) directives, p
 | FR-MOTION-04 | SceneChoreographer timeline | In progress | `SceneChoreographer` + `MotionTimeline` (pure Dart), `MotionProfile` per policy (decision 034). 15 unit tests (determinism, policy limits, no edge shown). **Emulator 14 Nov:** zoom in on Reader page 1 moved, then held still. Waiting for phone check and quiz |
 | FR-MOTION-05 | Only the picture moves; settles before the mic | In progress | `MotionScenePlayer` wraps only the picture; `settled` stops the camera when the step leaves ready. Widget tests. **Emulator 14 Nov:** sentence area 0.0 change; mic tap stopped the camera part way. Waiting for phone check and quiz |
 | FR-MOTION-06 | "Remove animations" → still scene | In progress | `MediaQuery.disableAnimationsOf` → still timeline, clock never starts. Unit + widget test; **not yet checked on a device** |
-| FR-MOTION-07 | Cue word eases the camera | Not started | Phase 3 (needs TTS word callbacks) |
-| FR-MOTION-08 | Mascot mouth on word boundaries | Not started | Phase 3 |
+| FR-MOTION-07 | Cue word eases the camera | In progress | `onWord` in `TextToSpeechService` (flutter_tts progress handler), `NarrationTracker` with `WordTiming` word-length guess, `cueTimelineFor` (decision 035). Unit + widget tests. **Emulator 14 Nov:** page 6 cue "owl" eased the camera to the focus point. Guess path not yet seen on a device. Waiting for phone check and quiz |
+| FR-MOTION-08 | Mascot mouth on word boundaries | In progress | Lumi at the viewer's top centre, mouth open 200 ms per word, at most once per 340 ms. Tests. **Emulator 14 Nov:** mouth opened while reading aloud. Waiting for phone check and quiz |
 | FR-MOTION-09 | Ambient effects on device | Not started | Phase 5 (CustomPainter proposed) |
 | FR-MOTION-10 | Mirror moves for RTL | In progress | Left/right pans mirror when `Directionality` is RTL; focus point not mirrored (decision 034). Unit-tested only; Urdu RTL UI is out of scope this semester |
 | FR-MOTION-11 | Character layer by segmentation | Not started | Phase 4, after a test and the team's decision (ML Kit terms) |

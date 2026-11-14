@@ -13,7 +13,11 @@ const zoomIn = MotionDirective(
   cueWord: '',
 );
 
-Widget player({bool settled = false, bool noAnimations = false}) {
+Widget player({
+  bool settled = false,
+  bool noAnimations = false,
+  bool cueHeard = false,
+}) {
   return MaterialApp(
     home: MediaQuery(
       data: MediaQueryData(disableAnimations: noAnimations),
@@ -25,6 +29,7 @@ Widget player({bool settled = false, bool noAnimations = false}) {
             directive: zoomIn,
             profile: MotionProfile.listener,
             settled: settled,
+            cueHeard: cueHeard,
             child: const ColoredBox(color: Colors.green),
           ),
         ),
@@ -83,5 +88,33 @@ void main() {
 
     expect(scaleNow(tester), 1.0);
     expect(tester.hasRunningAnimations, isFalse);
+  });
+
+  // ── The cue word eases the camera to the focus point (FR-MOTION-07) ──
+  testWidgets('the cue word ends the move early on the focus point', (
+    tester,
+  ) async {
+    await tester.pumpWidget(player());
+    await tester.pump(const Duration(seconds: 1));
+
+    await tester.pumpWidget(player(cueHeard: true));
+    await tester.pump(const Duration(milliseconds: 1600));
+
+    expect(scaleNow(tester), closeTo(1.12, 0.001));
+    expect(tester.hasRunningAnimations, isFalse);
+  });
+
+  testWidgets('in Reader Mode while reading the cue word is ignored', (
+    tester,
+  ) async {
+    await tester.pumpWidget(player());
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpWidget(player(settled: true));
+    final stoppedAt = scaleNow(tester);
+
+    await tester.pumpWidget(player(settled: true, cueHeard: true));
+    await tester.pump(const Duration(seconds: 2));
+
+    expect(scaleNow(tester), stoppedAt);
   });
 }

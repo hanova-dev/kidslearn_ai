@@ -165,4 +165,34 @@ void main() {
     expect(half.dx, closeTo(0.05, 0.0001));
     expect(half.dy, closeTo(-0.05, 0.0001));
   });
+
+  // ── The cue word: ease from where the camera is to the focus point (FR-MOTION-07) ──
+  test(
+    'the cue move starts where the camera is and ends on the focus point',
+    () {
+      const from = CameraFrame(scale: 1.03, dx: -0.01, dy: 0);
+      final cue = const SceneChoreographer().cueTimelineFor(
+        from,
+        directive('pan_right', focus: 'left'),
+        MotionProfile.listener,
+        reduceMotion: false,
+      );
+
+      expect(cue.cameraAt(0).scale, 1.03);
+      expect(cue.durationMs, MotionProfile.listener.cueMs);
+      expect(cue.cameraAt(cue.durationMs).scale, closeTo(1.12, 0.0001));
+      expect(cue.cameraAt(cue.durationMs).dx, closeTo(0.06, 0.0001));
+    },
+  );
+
+  test('with reduce motion the cue word does not move the camera', () {
+    final cue = const SceneChoreographer().cueTimelineFor(
+      CameraFrame.plain,
+      directive('slow_zoom_in', focus: 'right'),
+      MotionProfile.listener,
+      reduceMotion: true,
+    );
+
+    expect(cue.isStill, isTrue);
+  });
 }

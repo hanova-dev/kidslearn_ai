@@ -10,13 +10,21 @@ class FakeTextToSpeech implements TextToSpeechService {
   final List<String> languages = [];
   int stopCount = 0;
 
+  /// The word listener of the last [speak]; a test calls it to act like the phone's voice.
+  void Function(String word)? lastOnWord;
+
   @override
-  Future<bool> speak(String text, String languageCode) async {
+  Future<bool> speak(
+    String text,
+    String languageCode, {
+    void Function(String word)? onWord,
+  }) async {
     if (!hasVoice) {
       return false;
     }
     spoken.add(text);
     languages.add(languageCode);
+    lastOnWord = onWord;
     return true;
   }
 

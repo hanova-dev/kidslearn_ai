@@ -1,9 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kidslearn_ai/data/models/age_group.dart';
+import 'package:kidslearn_ai/core/widgets/lumi_mascot.dart';
 import 'package:kidslearn_ai/data/models/child_profile.dart';
+import 'package:kidslearn_ai/data/models/motion_directive.dart';
 import 'package:kidslearn_ai/data/models/scene.dart';
 import 'package:kidslearn_ai/data/models/story.dart';
 import 'package:kidslearn_ai/data/models/story_status.dart';
+import 'package:kidslearn_ai/features/reading/screens/motion_scene_player.dart';
 
 import '../../fakes/fake_auth_repository.dart';
 import '../../fakes/fake_child_repository.dart';
@@ -52,6 +56,14 @@ Scene makeScene(int number) {
     imagePrompt: '',
     imagePath: null,
     imageSource: null,
+    motion: const MotionDirective(
+      camera: 'static',
+      focus: 'left',
+      characterAction: 'idle_breathe',
+      effect: 'none',
+      mood: 'calm',
+      cueWord: 'sentence',
+    ),
   );
 }
 
@@ -132,6 +144,42 @@ void main() {
     await tester.pumpAndSettle();
     expect(voice.stopCount, greaterThan(stopsBefore));
   });
+
+  // ── Lumi's mouth and the cue word follow the voice (FR-MOTION-07, FR-MOTION-08) ──
+  testWidgets(
+    "each spoken word opens Lumi's mouth; the cue word moves the camera",
+    (tester) async {
+      await openViewer(tester);
+      bool mouthOpen() =>
+          tester.widget<LumiMascot>(find.byType(LumiMascot)).mouthOpen;
+      MotionScenePlayer picture() =>
+          tester.widget<MotionScenePlayer>(find.byType(MotionScenePlayer));
+
+      await tester.tap(find.byTooltip('Read aloud'));
+      await tester.pump();
+      expect(mouthOpen(), isFalse);
+      expect(picture().cueHeard, isFalse);
+
+      voice.lastOnWord!('Sentence');
+      await tester.pump();
+      expect(mouthOpen(), isTrue);
+      expect(picture().cueHeard, isTrue);
+
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(mouthOpen(), isFalse);
+      await tester.pumpAndSettle();
+      final scale = tester
+          .widget<Transform>(
+            find.descendant(
+              of: find.byType(MotionScenePlayer),
+              matching: find.byType(Transform),
+            ),
+          )
+          .transform
+          .getMaxScaleOnAxis();
+      expect(scale, closeTo(1.12, 0.001));
+    },
+  );
 
   testWidgets('with no voice on the phone a grown-up is told what to do', (
     tester,
