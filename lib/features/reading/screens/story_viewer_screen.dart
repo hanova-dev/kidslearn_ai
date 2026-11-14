@@ -13,6 +13,7 @@ import '../../../services/text_to_speech_service.dart';
 import '../../children/controllers/active_child.dart';
 import '../controllers/story_finisher.dart';
 import '../controllers/story_viewer_provider.dart';
+import 'motion_scene_player.dart';
 import 'scene_picture.dart';
 import 'viewer_controls.dart';
 import 'viewer_message.dart';
@@ -142,7 +143,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         children: [
-          // ── Scene picture (or scenery if it is missing) ──
+          // ── Scene picture (or scenery if it is missing), moved by the camera ──
           Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
@@ -151,7 +152,12 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
             ),
             child: AspectRatio(
               aspectRatio: 1.4,
-              child: ScenePicture(path: scene.imagePath),
+              child: MotionScenePlayer(
+                key: ValueKey(scene.id),
+                directive: scene.motion,
+                profile: const ListenerPolicy().motion,
+                child: ScenePicture(path: scene.imagePath),
+              ),
             ),
           ),
           const SizedBox(height: 24),

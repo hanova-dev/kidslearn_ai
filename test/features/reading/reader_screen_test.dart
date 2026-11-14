@@ -2,9 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kidslearn_ai/core/errors/speech_failure.dart';
 import 'package:kidslearn_ai/data/models/age_group.dart';
 import 'package:kidslearn_ai/data/models/child_profile.dart';
+import 'package:kidslearn_ai/data/models/motion_directive.dart';
 import 'package:kidslearn_ai/data/models/scene.dart';
 import 'package:kidslearn_ai/data/models/story.dart';
 import 'package:kidslearn_ai/data/models/story_status.dart';
+import 'package:kidslearn_ai/features/reading/screens/motion_scene_player.dart';
+import 'package:kidslearn_ai/features/reading/screens/reader_sentence.dart';
 
 import '../../fakes/fake_auth_repository.dart';
 import '../../fakes/fake_child_repository.dart';
@@ -46,7 +49,11 @@ Story makeStory() {
   );
 }
 
-Scene makeScene(int number, String text) {
+Scene makeScene(
+  int number,
+  String text, {
+  MotionDirective motion = MotionDirective.calm,
+}) {
   return Scene(
     id: 's1-scene-$number',
     storyId: 's1',
@@ -55,6 +62,7 @@ Scene makeScene(int number, String text) {
     imagePrompt: '',
     imagePath: null,
     imageSource: null,
+    motion: motion,
   );
 }
 
@@ -68,7 +76,18 @@ void main() {
     final stories = FakeStoryRepository();
     stories.stories['s1'] = makeStory();
     stories.scenes['s1'] = [
-      makeScene(1, 'The rabbit hops.'),
+      makeScene(
+        1,
+        'The rabbit hops.',
+        motion: const MotionDirective(
+          camera: 'slow_zoom_in',
+          focus: 'left',
+          characterAction: 'hop',
+          effect: 'none',
+          mood: 'happy',
+          cueWord: 'rabbit',
+        ),
+      ),
       makeScene(2, 'Sky hops home.'),
     ];
     speech = FakeSpeechToText(source: 'WHISPER');
@@ -126,6 +145,34 @@ void main() {
     expect(find.text('8'), findsOneWidget);
     expect(voice.spoken, contains('Great reading!'));
     expect(find.text('Next page'), findsOneWidget);
+  });
+
+  // ── Only the picture moves; it is still while the child reads (FR-MOTION-05) ──
+  testWidgets('the sentence is outside the moving picture', (tester) async {
+    await openReader(tester);
+
+    expect(find.byType(MotionScenePlayer), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(MotionScenePlayer),
+        matching: find.byType(ReaderSentence),
+      ),
+      findsNothing,
+    );
+  });
+
+  testWidgets('the camera is told to stay still once the mic starts', (
+    tester,
+  ) async {
+    await openReader(tester);
+    MotionScenePlayer picture() {
+      return tester.widget<MotionScenePlayer>(find.byType(MotionScenePlayer));
+    }
+
+    expect(picture().settled, isFalse);
+    await tester.tap(find.byTooltip('Read aloud'));
+    await tester.pumpAndSettle();
+    expect(picture().settled, isTrue);
   });
 
   testWidgets('a skipped word is soft coral and the phone says it', (

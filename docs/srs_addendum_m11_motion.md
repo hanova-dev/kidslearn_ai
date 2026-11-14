@@ -1,6 +1,6 @@
 # SRS Addendum (draft) — Module M11: Motion Comic Engine
 
-*Draft for KidsLearn AI SRS v1.2. Status: proposed by the team on 14 Nov 2026; not yet merged into the SRS. Phase 1 is built (decision 033).*
+*Draft for KidsLearn AI SRS v1.2. Status: proposed by the team on 14 Nov 2026; not yet merged into the SRS. Phase 1 (decision 033) and phase 2 (decision 034) are built.*
 
 ## 3.11 Module M11 — Motion Comic Engine
 
@@ -28,7 +28,7 @@ Priority: Should-Have. Primary Actor: Child (playback), System (directives and p
 | **Capability** | **Primary** | **Fallback** | **Notes** |
 |---|---|---|---|
 | Motion directives | Same Groq `openai/gpt-oss-120b` story request (one line per page) | Calm default motion | No extra call. Fits the free 8,000 tokens per minute: about 1,700 prompt + 5,000 answer limit, `reasoning_effort: low` (decision 033). |
-| Motion playback | On-device Flutter animation (`AnimationController`, `Transform`) | Still image | No service, no network, no data leaves the phone. |
+| Motion playback | On-device Flutter animation (`AnimationController`, `Transform`) | Still image | No service, no network, no data leaves the phone. Per-age `MotionProfile`: Listener 8 s / zoom 1.12, Reader 4 s / zoom 1.08 (decision 034). |
 | Ambient effects | Drawn on device with `CustomPainter` (proposed) | No effect | No package and no asset licences needed; `lottie` (MIT) with licensed assets was considered. |
 | Subject segmentation | Google ML Kit Subject Segmentation (candidate only) | Single layer (no segmentation) | Not adopted yet: the API is beta; the model is downloaded through Google Play services; ML Kit sends usage metrics to Google (images stay on the device); its terms do not address children's apps. To be decided after a test on our FLUX images (NFR-PRIV-06). |
 

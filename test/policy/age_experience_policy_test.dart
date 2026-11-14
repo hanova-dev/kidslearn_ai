@@ -12,6 +12,7 @@ void main() {
     expect(policy.sessionMode, 'LISTENER');
     expect(policy.touchTarget, 64);
     expect(policy.storyTextSize, 24);
+    expect(policy.motion.cameraMs, 8000);
   });
 
   test('5-7 gets the Reader policy: reads aloud', () {
@@ -22,5 +23,13 @@ void main() {
     expect(policy.sessionMode, 'READER');
     expect(policy.touchTarget, 56);
     expect(policy.storyTextSize, inInclusiveRange(22, 26));
+    expect(
+      policy.motion.cameraMs,
+      lessThan(const ListenerPolicy().motion.cameraMs),
+    );
+    expect(
+      policy.motion.maxZoom,
+      lessThan(const ListenerPolicy().motion.maxZoom),
+    );
   });
 }

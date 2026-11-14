@@ -8,6 +8,7 @@ import '../controllers/sentence_check.dart';
 import '../controllers/shown_word.dart';
 import 'reader_banner.dart';
 import 'reader_controls.dart';
+import 'motion_scene_player.dart';
 import 'reader_sentence.dart';
 import 'scene_picture.dart';
 import 'verdict_style.dart';
@@ -52,7 +53,7 @@ class ReaderPage extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         children: [
-          // ── Scene picture (or scenery if it is missing) ──
+          // ── Scene picture, moved by the camera; still once the microphone starts (FR-MOTION-05) ──
           Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
@@ -61,7 +62,13 @@ class ReaderPage extends StatelessWidget {
             ),
             child: AspectRatio(
               aspectRatio: 1.7,
-              child: ScenePicture(path: scene.imagePath),
+              child: MotionScenePlayer(
+                key: ValueKey(scene.id),
+                directive: scene.motion,
+                profile: const ReaderPolicy().motion,
+                settled: step != ReaderStep.ready,
+                child: ScenePicture(path: scene.imagePath),
+              ),
             ),
           ),
           const SizedBox(height: 20),
