@@ -13,6 +13,7 @@ void main() {
     expect(policy.touchTarget, 64);
     expect(policy.storyTextSize, 24);
     expect(policy.motion.cameraMs, 8000);
+    expect(policy.motion.effectCount, 16);
   });
 
   test('5-7 gets the Reader policy: reads aloud', () {
@@ -30,6 +31,10 @@ void main() {
     expect(
       policy.motion.maxZoom,
       lessThan(const ListenerPolicy().motion.maxZoom),
+    );
+    expect(
+      policy.motion.effectCount,
+      lessThan(const ListenerPolicy().motion.effectCount),
     );
   });
 }

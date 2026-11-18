@@ -30,7 +30,7 @@ Priority: Should-Have. Primary Actor: Child (playback), System (directives and p
 | Motion directives | Same Groq `openai/gpt-oss-120b` story request (one line per page) | Calm default motion | No extra call. Fits the free 8,000 tokens per minute: about 1,700 prompt + 5,000 answer limit, `reasoning_effort: low` (decision 033). |
 | Motion playback | On-device Flutter animation (`AnimationController`, `Transform`) | Still image | No service, no network, no data leaves the phone. Per-age `MotionProfile`: Listener 8 s / zoom 1.12, Reader 4 s / zoom 1.08 (decision 034). |
 | Word timing for narration sync | Phone voice word events (flutter_tts `setProgressHandler`, Android `onRangeStart`) | Word-length guess (`WordTiming`, measured on the emulator voice) | No new package; offline (decision 035). |
-| Ambient effects | Drawn on device with `CustomPainter` (proposed) | No effect | No package and no asset licences needed; `lottie` (MIT) with licensed assets was considered. |
+| Ambient effects | Drawn on device with `CustomPainter` (decision 037: leaves, rain, snow, stars, sparkles, bubbles, butterflies) | No effect | No package and no asset licences needed; `lottie` (MIT) with licensed assets was considered. |
 | Subject segmentation | None this semester (decision 036) | Single layer (no segmentation) | ML Kit Subject Segmentation (beta) was tested on 14 Nov: the model needed an explicit Play services install, then the native code crashed on the emulator. Also: usage metrics to Google, terms silent on children's apps (NFR-PRIV-06). Not adopted. |
 
 ## Non-functional requirement updates (proposed)

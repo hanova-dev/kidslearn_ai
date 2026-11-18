@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../algorithms/ambient_effect.dart';
 import '../../../algorithms/motion_timeline.dart';
 import '../../../algorithms/scene_choreographer.dart';
 import '../../../data/models/motion_directive.dart';
 import '../../../policy/motion_profile.dart';
+import 'ambient_effect_layer.dart';
 
-/// Moves only the picture of a page along its camera timeline; the text is never inside it (FR-MOTION-04, FR-MOTION-05).
+/// Moves only the picture of a page and draws its ambient effect; the text is never inside it (FR-MOTION-04, 05, 09).
 class MotionScenePlayer extends StatefulWidget {
   const MotionScenePlayer({
     super.key,
@@ -35,6 +37,7 @@ class MotionScenePlayer extends StatefulWidget {
 class _MotionScenePlayerState extends State<MotionScenePlayer>
     with SingleTickerProviderStateMixin {
   late final AnimationController _clock;
+  late final AmbientEffect _effect;
   MotionTimeline _timeline = MotionTimeline.still;
   bool _reduceMotion = false;
 
@@ -42,6 +45,10 @@ class _MotionScenePlayerState extends State<MotionScenePlayer>
   void initState() {
     super.initState();
     _clock = AnimationController(vsync: this);
+    _effect = AmbientEffect(
+      widget.directive.effect,
+      count: widget.profile.effectCount,
+    );
   }
 
   // ── Make the timeline (needs the text direction and "Remove animations") ──
@@ -101,21 +108,33 @@ class _MotionScenePlayerState extends State<MotionScenePlayer>
     super.dispose();
   }
 
-  // ── Draw the picture at the camera of this moment ──
+  // ── Draw the picture at the camera of this moment, and the effect on top ──
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
       child: ClipRect(
-        child: AnimatedBuilder(
-          animation: _clock,
-          child: widget.child,
-          builder: (context, picture) {
-            final camera = _timeline.cameraAt(_currentMs());
-            return FractionalTranslation(
-              translation: Offset(camera.dx, camera.dy),
-              child: Transform.scale(scale: camera.scale, child: picture),
-            );
-          },
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            AnimatedBuilder(
+              animation: _clock,
+              child: widget.child,
+              builder: (context, picture) {
+                final camera = _timeline.cameraAt(_currentMs());
+                return FractionalTranslation(
+                  translation: Offset(camera.dx, camera.dy),
+                  child: Transform.scale(scale: camera.scale, child: picture),
+                );
+              },
+            ),
+            if (!_effect.isNone && !_reduceMotion)
+              Positioned.fill(
+                child: AmbientEffectLayer(
+                  effect: _effect,
+                  running: !widget.settled,
+                ),
+              ),
+          ],
         ),
       ),
     );

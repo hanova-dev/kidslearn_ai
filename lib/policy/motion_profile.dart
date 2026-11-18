@@ -3,6 +3,7 @@ class MotionProfile {
   const MotionProfile({
     required this.cameraMs,
     required this.maxZoom,
+    required this.effectCount,
     this.cueMs = 1500,
   });
 
@@ -11,12 +12,14 @@ class MotionProfile {
   static const MotionProfile listener = MotionProfile(
     cameraMs: 8000,
     maxZoom: 1.12,
+    effectCount: 16,
   );
 
   /// Ages 5–7: a short 4-second move, up to 8% closer, so it is usually still before the child reads.
   static const MotionProfile reader = MotionProfile(
     cameraMs: 4000,
     maxZoom: 1.08,
+    effectCount: 10,
   );
 
   /// How long one camera move lasts, in milliseconds; then the picture stays still.
@@ -27,4 +30,7 @@ class MotionProfile {
 
   /// How long the camera takes to ease to the focus point when the cue word is spoken.
   final int cueMs;
+
+  /// How many leaves, drops, stars… an ambient effect draws at once (FR-MOTION-09).
+  final int effectCount;
 }
