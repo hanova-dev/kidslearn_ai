@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import '../../../algorithms/ambient_effect.dart';
+import '../../../algorithms/frame_drop_detector.dart';
 import '../../../app/app_colors.dart';
 import 'ambient_effect_painter.dart';
 
@@ -10,10 +11,14 @@ class AmbientEffectLayer extends StatefulWidget {
   const AmbientEffectLayer({
     super.key,
     required this.effect,
+    required this.onTooSlow,
     this.running = true,
   });
 
   final AmbientEffect effect;
+
+  /// Called once if the phone draws too many slow frames while the effect runs (FR-MOTION-12).
+  final VoidCallback onTooSlow;
 
   /// False freezes the particles where they are (Reader Mode while reading).
   final bool running;
@@ -26,6 +31,7 @@ class _AmbientEffectLayerState extends State<AmbientEffectLayer>
     with SingleTickerProviderStateMixin {
   final ValueNotifier<int> _clock = ValueNotifier<int>(0);
   late final Ticker _ticker;
+  final FrameDropDetector _frames = FrameDropDetector();
   int _frozenMs = 0;
 
   // ── Start the clock: every frame tells the painter the new time ──
@@ -37,6 +43,20 @@ class _AmbientEffectLayerState extends State<AmbientEffectLayer>
     });
     if (widget.running) {
       _ticker.start();
+    }
+    SchedulerBinding.instance.addTimingsCallback(_checkFrames);
+  }
+
+  // ── Watch the real frame times while the effect moves (FR-MOTION-12) ──
+  void _checkFrames(List<FrameTiming> timings) {
+    if (!_ticker.isActive) {
+      return;
+    }
+    for (final timing in timings) {
+      final drawTime = timing.buildDuration + timing.rasterDuration;
+      if (_frames.addFrame(drawTime.inMilliseconds)) {
+        widget.onTooSlow();
+      }
     }
   }
 
@@ -55,6 +75,7 @@ class _AmbientEffectLayerState extends State<AmbientEffectLayer>
 
   @override
   void dispose() {
+    SchedulerBinding.instance.removeTimingsCallback(_checkFrames);
     _ticker.dispose();
     _clock.dispose();
     super.dispose();

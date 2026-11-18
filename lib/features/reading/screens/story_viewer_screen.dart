@@ -2,22 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/app_colors.dart';
 import '../../../app/providers.dart';
 import '../../../app/router.dart';
-import '../../../core/constants/app_fonts.dart';
 import '../../../core/widgets/child_scaffold.dart';
 import '../../../core/widgets/lumi_mascot.dart';
 import '../../../core/widgets/round_icon_button.dart';
-import '../../../policy/age_experience_policy.dart';
 import '../../children/controllers/active_child.dart';
 import '../controllers/narration_tracker.dart';
 import '../controllers/story_finisher.dart';
 import '../controllers/story_viewer_provider.dart';
-import 'motion_scene_player.dart';
-import 'scene_picture.dart';
 import 'viewer_controls.dart';
 import 'viewer_message.dart';
+import 'viewer_page.dart';
 
 /// Shows one approved story page by page: picture, sentence, read aloud (design p13, decisions 006, 025, 026).
 class StoryViewerScreen extends ConsumerStatefulWidget {
@@ -160,50 +156,13 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen> {
   }
 
   Widget _buildPage(StoryViewerData data) {
-    final colors = AppColors.of(context);
-    final scene = data.scenes[_page];
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         children: [
-          // ── Scene picture (or scenery if it is missing), moved by the camera ──
-          Container(
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: colors.border, width: 2),
-            ),
-            child: AspectRatio(
-              aspectRatio: 1.4,
-              child: MotionScenePlayer(
-                key: ValueKey(scene.id),
-                directive: scene.motion,
-                profile: const ListenerPolicy().motion,
-                cueHeard: _cueHeard,
-                child: ScenePicture(path: scene.imagePath),
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // ── Sentence in Andika ──
           Expanded(
-            child: SingleChildScrollView(
-              child: SizedBox(
-                width: double.infinity,
-                child: Text(
-                  scene.text,
-                  style: TextStyle(
-                    fontFamily: AppFonts.andika,
-                    fontSize: const ListenerPolicy().storyTextSize,
-                    height: 1.4,
-                    color: colors.ink,
-                  ),
-                ),
-              ),
-            ),
+            child: ViewerPage(scene: data.scenes[_page], cueHeard: _cueHeard),
           ),
-
           ViewerControls(
             pageIndex: _page,
             pageCount: data.scenes.length,

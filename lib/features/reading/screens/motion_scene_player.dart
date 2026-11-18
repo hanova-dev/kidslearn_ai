@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../algorithms/ambient_effect.dart';
 import '../../../algorithms/motion_timeline.dart';
 import '../../../algorithms/scene_choreographer.dart';
 import '../../../data/models/motion_directive.dart';
 import '../../../policy/motion_profile.dart';
+import '../controllers/effects_switch.dart';
 import 'ambient_effect_layer.dart';
 
 /// Moves only the picture of a page and draws its ambient effect; the text is never inside it (FR-MOTION-04, 05, 09).
-class MotionScenePlayer extends StatefulWidget {
+class MotionScenePlayer extends ConsumerStatefulWidget {
   const MotionScenePlayer({
     super.key,
     required this.directive,
@@ -31,10 +33,10 @@ class MotionScenePlayer extends StatefulWidget {
   final bool cueHeard;
 
   @override
-  State<MotionScenePlayer> createState() => _MotionScenePlayerState();
+  ConsumerState<MotionScenePlayer> createState() => _MotionScenePlayerState();
 }
 
-class _MotionScenePlayerState extends State<MotionScenePlayer>
+class _MotionScenePlayerState extends ConsumerState<MotionScenePlayer>
     with SingleTickerProviderStateMixin {
   late final AnimationController _clock;
   late final AmbientEffect _effect;
@@ -111,6 +113,7 @@ class _MotionScenePlayerState extends State<MotionScenePlayer>
   // ── Draw the picture at the camera of this moment, and the effect on top ──
   @override
   Widget build(BuildContext context) {
+    final effectsAllowed = ref.watch(effectsAllowedProvider);
     return RepaintBoundary(
       child: ClipRect(
         child: Stack(
@@ -127,11 +130,14 @@ class _MotionScenePlayerState extends State<MotionScenePlayer>
                 );
               },
             ),
-            if (!_effect.isNone && !_reduceMotion)
+            if (effectsAllowed && !_effect.isNone && !_reduceMotion)
               Positioned.fill(
                 child: AmbientEffectLayer(
                   effect: _effect,
                   running: !widget.settled,
+                  onTooSlow: () {
+                    ref.read(effectsAllowedProvider.notifier).turnOff();
+                  },
                 ),
               ),
           ],

@@ -1,6 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kidslearn_ai/data/models/motion_directive.dart';
+import 'package:kidslearn_ai/features/reading/controllers/effects_switch.dart';
 import 'package:kidslearn_ai/features/reading/screens/ambient_effect_layer.dart';
 import 'package:kidslearn_ai/features/reading/screens/ambient_effect_painter.dart';
 import 'package:kidslearn_ai/features/reading/screens/motion_scene_player.dart';
@@ -22,6 +26,25 @@ Widget player({
   bool noAnimations = false,
   bool cueHeard = false,
   String effect = 'none',
+  ProviderContainer? container,
+}) {
+  final app = playerApp(
+    settled: settled,
+    noAnimations: noAnimations,
+    cueHeard: cueHeard,
+    effect: effect,
+  );
+  if (container == null) {
+    return ProviderScope(child: app);
+  }
+  return UncontrolledProviderScope(container: container, child: app);
+}
+
+Widget playerApp({
+  required bool settled,
+  required bool noAnimations,
+  required bool cueHeard,
+  required String effect,
 }) {
   return MaterialApp(
     home: MediaQuery(
@@ -179,15 +202,21 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: Center(
-          child: SizedBox(
-            width: 300,
-            height: 200,
-            child: MotionScenePlayer(
-              directive: zoomInWith('rain'),
-              profile: MotionProfile.reader,
-              child: const SizedBox(key: Key('picture'), width: 50, height: 50),
+      ProviderScope(
+        child: MaterialApp(
+          home: Center(
+            child: SizedBox(
+              width: 300,
+              height: 200,
+              child: MotionScenePlayer(
+                directive: zoomInWith('rain'),
+                profile: MotionProfile.reader,
+                child: const SizedBox(
+                  key: Key('picture'),
+                  width: 50,
+                  height: 50,
+                ),
+              ),
             ),
           ),
         ),
@@ -198,5 +227,46 @@ void main() {
       tester.getSize(find.byKey(const Key('picture'))),
       const Size(300, 200),
     );
+  });
+
+  // ── A too-slow phone: effects off, camera still moves (FR-MOTION-12) ──
+  testWidgets('with effects switched off, no effect but the camera moves', (
+    tester,
+  ) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    container.read(effectsAllowedProvider.notifier).turnOff();
+
+    await tester.pumpWidget(player(effect: 'snow', container: container));
+    await tester.pump(const Duration(seconds: 4));
+
+    expect(find.byType(AmbientEffectLayer), findsNothing);
+    expect(scaleNow(tester), closeTo(1.06, 0.001));
+  });
+
+  testWidgets('many slow frames switch the effects off', (tester) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    await tester.pumpWidget(player(effect: 'snow', container: container));
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final slowFrames = <FrameTiming>[];
+    for (var i = 0; i < 10; i++) {
+      slowFrames.add(
+        FrameTiming(
+          vsyncStart: 0,
+          buildStart: 0,
+          buildFinish: 30000,
+          rasterStart: 30000,
+          rasterFinish: 50000,
+          rasterFinishWallTime: 50000,
+        ),
+      );
+    }
+    tester.binding.platformDispatcher.onReportTimings!(slowFrames);
+    await tester.pump();
+
+    expect(container.read(effectsAllowedProvider), isFalse);
+    expect(find.byType(AmbientEffectLayer), findsNothing);
   });
 }
